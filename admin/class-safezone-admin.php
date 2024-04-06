@@ -1,0 +1,473 @@
+<?php
+
+/**
+ * The admin-specific functionality of the plugin.
+ *
+ * @link       https://brunos.digital
+ * @since      1.0.0
+ *
+ * @package    Safezone
+ * @subpackage Safezone/admin
+ */
+
+/**
+ * The admin-specific functionality of the plugin.
+ *
+ * Defines the plugin name, version, and two examples hooks for how to
+ * enqueue the admin-specific stylesheet and JavaScript.
+ *
+ * @package    Safezone
+ * @subpackage Safezone/admin
+ * @author     WP Safe Zone <info@safezone.com>
+ */
+class Safezone_Admin
+{
+
+    /**
+     * The ID of this plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      string $plugin_name The ID of this plugin.
+     */
+    private string $plugin_name;
+
+    /**
+     * The version of this plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      string $version The current version of this plugin.
+     */
+
+    private string $version;
+
+    public array $plugin_settings;
+
+    /**
+     * @var array|array[]
+     */
+    public array $menu;
+
+
+    /**
+     * Initialize the class and set its properties.
+     *
+     * @param string $plugin_name The name of this plugin.
+     * @param string $version The version of this plugin.
+     * @since    1.0.0
+     */
+    public function __construct(string $plugin_name, string $version)
+    {
+
+        $this->plugin_name = $plugin_name;
+        $this->version = $version;
+        $this->menu = [];
+
+        $this->plugin_settings = get_options([
+            'sz_licence',
+            'sz_disable_embeds',
+            'sz_disable_xml',
+            'sz_hide_wp_version',
+            'sz_disable_self_pingbacks',
+            'sz_disable_rest_api',
+            'sz_ignore_logged',
+            'sz_sql_injection',
+            'sz_xss_check',
+            'sz_disable_comments',
+            'sz_disable_heartbeat',
+            'sz_protect_woocommerce_payment_forms',
+            'sz_protect_contact_forms',
+            'sz_remove_rsd_link',
+            'sz_remove_shortlink',
+            'sz_disable_rss_feeds',
+            'sz_aggressive_search',
+            'sz_enable_autoscanning',
+            'sz_schedule_autoscanning',
+            'sz_importing_file_monitoring',
+            'sz_scan_html_code',
+            'sz_heuristic_analysis',
+            'sz_set_custom_scan_path',
+            'sz_check_plugin',
+            'sz_check_theme',
+            'sz_check_exploits',
+            'sz_login_protection',
+        ]);
+
+    }
+
+    /**
+     * Register the stylesheets for the admin area.
+     *
+     * @since    1.0.0
+     */
+    public function enqueue_styles(): void
+    {
+        wp_enqueue_style($this->plugin_name . '-toastify', plugin_dir_url(__FILE__) . 'css/toastify.css', [], $this->version, 'all');
+        wp_enqueue_style($this->plugin_name . '-main', plugin_dir_url(__FILE__) . 'css/main.css', [], $this->version, 'all');
+        wp_enqueue_style($this->plugin_name . '-custom', plugin_dir_url(__FILE__) . 'css/safezone-admin.css', [], $this->version, 'all');
+    }
+
+    /**
+     * Register the JavaScript for the admin area.
+     *
+     * @since    1.0.0
+     */
+    public function enqueue_scripts(): void
+    {
+        wp_enqueue_script($this->plugin_name . '-main', plugin_dir_url(__FILE__) . 'js/vendor.js', ['jquery'], $this->version, false);
+        wp_enqueue_script($this->plugin_name . '-toastify', plugin_dir_url(__FILE__) . 'js/toastify.js', ['jquery'], $this->version, false);
+        wp_enqueue_script($this->plugin_name . '-vendor', plugin_dir_url(__FILE__) . 'js/main.js', ['jquery'], $this->version, false);
+        wp_enqueue_script($this->plugin_name . '-custom', plugin_dir_url(__FILE__) . 'js/safezone-admin.js', ['jquery'], $this->version, false);
+    }
+
+    public function safezone_menu(): void
+    {
+        add_menu_page(
+            'Safe Zone',
+            'Safe Zone',
+            'manage_options',
+            'safezone-dashboard',
+            [$this, 'safezone_router'],
+            SAFEZONE_PLUGIN_URL.'/admin/images/favicon.svg',
+            61
+        );
+
+        add_submenu_page('safezone-dashboard', 'Dashboard', 'Dashboard', 'manage_options', 'safezone-dashboard', [$this, 'safezone_router']);
+
+
+        if ((new Safezone)->is_pro()) {
+            add_submenu_page('safezone-dashboard', 'Firewall', 'Firewall', 'manage_options', 'safezone-firewall', [$this, 'safezone_router']);
+        } else {
+            add_submenu_page('safezone-dashboard', 'Firewall (Free)', 'Firewall (Free)', 'manage_options', 'safezone-firewall-free', [$this, 'safezone_router']);
+        }
+
+        add_submenu_page('safezone-dashboard', 'Anti-Spam Engine', 'Anti-Spam Engine', 'manage_options', 'safezone-anti-spam-engine', [$this, 'safezone_router']);
+        add_submenu_page('safezone-dashboard', 'Malware Scanner', 'Malware Scanner', 'manage_options', 'safezone-malware-scanner', [$this, 'safezone_router']);
+
+
+        add_submenu_page('safezone-dashboard', 'Events', 'Events', 'manage_options', 'safezone-events', [$this, 'safezone_router']);
+        add_submenu_page('safezone-dashboard', 'Lockouts', 'Lockouts', 'manage_options', 'safezone-lockouts', [$this, 'safezone_router']);
+        add_submenu_page('safezone-dashboard', 'Whitelist', 'Whitelist', 'manage_options', 'safezone-whitelist', [$this, 'safezone_router']);
+        add_submenu_page('safezone-dashboard', 'Logs', 'Logs', 'manage_options', 'safezone-logs', [$this, 'safezone_router']);
+
+        add_submenu_page('safezone-dashboard', 'Settings', 'Settings', 'manage_options', 'safezone-settings', [$this, 'safezone_settings_router']);
+    }
+
+    public function safezone_router(): void
+    {
+        ob_start();
+        $validPages = ['safezone-firewall', 'safezone-firewall-free', 'safezone-malware-scanner', 'safezone-anti-spam-engine', 'safezone-events', 'safezone-lockouts', 'safezone-whitelist', 'safezone-logs', 'safezone-settings'];
+        $page = 'dashboard';
+        if (isset($_GET["page"]) && in_array($_GET["page"], $validPages)) {
+            $page = str_replace('safezone-', '', $_GET["page"]);
+        }
+
+        $this->menu[] = [
+            'name' => 'Dashboard',
+            'slug' => 'dashboard',
+            'path' => admin_url('admin.php?page=safezone-dashboard'),
+            'is_active' => $page === 'dashboard',
+        ];
+
+        $this->menu[] = [
+            'name' => 'Events',
+            'slug' => 'events',
+            'path' => admin_url('admin.php?page=safezone-events'),
+            'is_active' => $page === 'events',
+        ];
+
+        $this->menu[] = [
+            'name' => 'Lockouts',
+            'slug' => 'lockouts',
+            'path' => admin_url('admin.php?page=safezone-lockouts'),
+            'is_active' => $page === 'lockouts',
+        ];
+
+        $this->menu[] = [
+            'name' => 'Whitelist',
+            'slug' => 'whitelist',
+            'path' => admin_url('admin.php?page=safezone-whitelist'),
+            'is_active' => $page === 'whitelist',
+        ];
+
+        $this->menu[] = [
+            'name' => 'Logs',
+            'slug' => 'logs',
+            'path' => admin_url('admin.php?page=safezone-logs'),
+            'is_active' => $page === 'logs',
+        ];
+
+        include_once(SAFEZONE_PLUGIN_PATH . 'admin/partials/safezone-admin-' . $page . '.php');
+        $template = ob_get_contents();
+        ob_end_clean();
+        echo $template;
+    }
+
+    public function safezone_settings_router(): void
+    {
+        ob_start();
+        $validPages = ['firewall', 'scanner', 'spam', 'notifications', 'changelog', 'licence', 'licence-free'];
+        $tab = 'firewall';
+        if (isset($_GET["tab"]) && in_array($_GET["tab"], $validPages)) {
+            $tab = $_GET["tab"];
+        }
+
+        $this->menu[] = [
+            'name' => 'Firewall',
+            'slug' => 'firewall',
+            'path' => admin_url('admin.php?page=safezone-settings&tab=firewall'),
+            'is_active' => $tab === 'firewall',
+        ];
+
+        $this->menu[] = [
+            'name' => 'Anti-Spam',
+            'slug' => 'spam',
+            'path' => admin_url('admin.php?page=safezone-settings&tab=spam'),
+            'is_active' => $tab === 'spam',
+        ];
+
+        $this->menu[] = [
+            'name' => 'Malware Scanner',
+            'slug' => 'scanner',
+            'path' => admin_url('admin.php?page=safezone-settings&tab=scanner'),
+            'is_active' => $tab === 'scanner',
+        ];
+
+        $this->menu[] = [
+            'name' => 'Notifications',
+            'slug' => 'notifications',
+            'path' => admin_url('admin.php?page=safezone-settings&tab=notifications'),
+            'is_active' => $tab === 'notifications',
+        ];
+
+        if ((new Safezone)->is_pro()) {
+            $this->menu[] = [
+                'name' => 'Licence',
+                'slug' => 'licence',
+                'path' => admin_url('admin.php?page=safezone-settings&tab=licence'),
+                'is_active' => $tab === 'licence',
+            ];
+        } else {
+            $this->menu[] = [
+                'name' => 'Licence (Free)',
+                'slug' => 'licence-free',
+                'path' => admin_url('admin.php?page=safezone-settings&tab=licence-free'),
+                'is_active' => $tab === 'licence-free',
+            ];
+        }
+
+        $this->menu[] = [
+            'name' => 'Changelog',
+            'slug' => 'changelog',
+            'path' => admin_url('admin.php?page=safezone-settings&tab=changelog'),
+            'is_active' => $tab === 'changelog',
+        ];
+
+        include_once(SAFEZONE_PLUGIN_PATH . 'admin/partials/safezone-admin-settings-' . $tab . '.php');
+        $template = ob_get_contents();
+        ob_end_clean();
+        echo $template;
+    }
+
+    public function get_ip_address()
+    {
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+        return $ip;
+    }
+
+    public function save_settings(): void
+    {
+        $settings = $_POST;
+        foreach ($settings['payload'] as $key => $value) {
+            update_option('sz_' . $key, $value);
+        }
+        wp_send_json([
+            'success' => true,
+            'message' => 'Settings saved successfully.',
+            'data' => []
+        ]);
+    }
+
+    public function ip_details($ip)
+    {
+        $json = file_get_contents("https://ipinfo.io/{$ip}/geo");
+        return json_decode($json, true);
+    }
+
+    public function get_whitelist(): array|null|object
+    {
+        $page_number = isset($_GET['p']) ? absint($_GET['p']) : 1;
+        $items_per_page = 10;
+
+        global $wpdb;
+
+        $offset = ($page_number - 1) * $items_per_page;
+        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_whitelist");
+        $query = $wpdb->prepare("SELECT * FROM wp_sz_whitelist ORDER BY created_at DESC LIMIT %d, %d", $offset, $items_per_page);
+
+        return [
+            'data' => $wpdb->get_results($query, ARRAY_A),
+            'meta' => [
+                'total_count' => $total_count,
+                'total_pages' => ceil($total_count / $items_per_page),
+                'current_page' => $page_number
+            ]
+        ];
+
+    }
+
+    public function add_whitelist(): void
+    {
+        $whitelist = $_POST['payload'] ?? '';
+
+        if (empty($whitelist['ip'])) {
+            wp_send_json_error([
+                'message' => 'IP is required.'
+            ]);
+        }
+
+        $response = $this->ip_details($whitelist['ip']);
+
+        if (!$response) {
+            wp_send_json_error([
+                'message' => 'Invalid IP.'
+            ]);
+        }
+
+        $ip_version = "";
+
+        if (filter_var($response['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $ip_version = "IPv4";
+        } else if (filter_var($response['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $ip_version = "IPv6";
+        }
+
+        if ($response['ip'] == "") {
+            wp_send_json_error([
+                'message' => 'Invalid IP.'
+            ]);
+        }
+
+        if ($response['country'] == "") {
+            wp_send_json_error([
+                'message' => 'Invalid Country.'
+            ]);
+        }
+
+        global $wpdb;
+        $insert = $wpdb->insert('wp_sz_whitelist', [
+            'ip_address' => $response['ip'],
+            'country_code' => $response['country'],
+            'country_name' => $response['region'],
+            'hostname' => $response['hostname'],
+            'location' => $response['loc'],
+            'org' => $response['org'],
+            'timezone' => $response['timezone'],
+            'ip_version' => $ip_version,
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+
+        if (!$insert) {
+            wp_send_json_error([
+                'message' => 'Failed to add IP to whitelist.'
+            ]);
+        }
+
+        wp_send_json_success([
+            'message' => 'IP added to whitelist successfully.'
+        ]);
+    }
+
+    public function add_licence(): void
+    {
+        $licence = $_POST['payload'] ?? '';
+        $licence_key = $licence['licence'] ?? '';
+        $response = wp_remote_post(API_URL . '/licence/check', [
+            'body' => json_encode([
+                'licence' => $licence_key
+            ]),
+            'headers' => [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        $response_body = json_decode($response['body'], true);
+        if ($response['response']['code'] != 200 || !$response_body['success']) {
+            wp_send_json([
+                'success' => false,
+                'message' => 'Invalid Licence',
+                'data' => []
+            ]);
+        }
+        update_option('sz_licence', $licence_key);
+        file_put_contents(SAFEZONE_PLUGIN_PRO_PATH, base64_decode($response_body['data']['encrypted']));
+        wp_send_json([
+            'success' => true,
+            'message' => 'Licence added successfully',
+            'data' => []
+        ]);
+    }
+
+    public function subscribe(): void
+    {
+        $email = $_POST['payload']['email'] ?? '';
+        if ($email == "") {
+            wp_send_json([
+                'success' => false,
+                'message' => 'Email is required',
+                'data' => []
+            ]);
+        }
+        $name = $_POST['payload']['name'] ?? '';
+        if ($name == "") {
+            wp_send_json([
+                'success' => false,
+                'message' => 'Name is required',
+                'data' => []
+            ]);
+        }
+
+        $website = $_POST['payload']['website'] ?? '';
+        if ($website == "") {
+            wp_send_json([
+                'success' => false,
+                'message' => 'Website is required',
+                'data' => []
+            ]);
+        }
+        $response = wp_remote_post(API_URL . '/subscription/subscribe', [
+            'body' => [
+                'email' => $email,
+                'name' => $name,
+                'website' => $website
+            ],
+            [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ]
+            ]
+        ]);
+
+        $response_body = json_decode($response['body'], true);
+        if ($response['response']['code'] != 200 || !$response_body['success']) {
+            wp_send_json([
+                'success' => false,
+                'message' => $response_body['message'],
+                'data' => []
+            ]);
+        }
+        wp_send_json([
+            'success' => true,
+            'message' => $response_body['message'],
+            'data' => $response_body['data']
+        ]);
+    }
+}

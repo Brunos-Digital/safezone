@@ -1,0 +1,17 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+.pagination-left {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.pagination-left .page-numbers {
+    font-family: Open Sans, sans-serif;
+    font-size:14px;
+    color: #8c8f94;
+}

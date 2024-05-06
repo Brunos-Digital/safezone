@@ -65,9 +65,9 @@ class Safezone_Activator
         add_option('sz_login_protection', "0");
 
         global $wpdb;
+        $charset_collate = $wpdb->get_charset_collate();
 
         $sz_whitelist = $wpdb->prefix . "sz_whitelist";
-        $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE `" . $sz_whitelist . "` (
                       `id` mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
                       `ip_address` varchar(255) NOT NULL,
@@ -78,6 +78,19 @@ class Safezone_Activator
                       `org` varchar(255) DEFAULT NULL,
                       `ip_version` varchar(255) DEFAULT NULL,
                       `timezone` varchar(255) DEFAULT NULL,
+                      `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                      PRIMARY KEY (`id`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+
+        $sz_malware_report = $wpdb->prefix . "sz_malware_reports";
+        $sql = "CREATE TABLE `" . $sz_malware_report . "` (
+                      `id` mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
+                      `path` varchar(255) NOT NULL,
+                      `message` varchar(255) NOT NULL,
+                      `state` varchar(255) NOT NULL,
+                      `status` varchar(255) NOT NULL DEFAULT 'Pending',
                       `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       PRIMARY KEY (`id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";

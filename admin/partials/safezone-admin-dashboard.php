@@ -12,15 +12,11 @@
  * @subpackage Safezone/admin/partials
  */
 
-
-$url = wp_parse_url(home_url());
-echo $domain = $url['host'];
+if ( ! defined( 'WPINC' ) ) {
+    die;
+}
 
 $keywords = [
-    'base64',
-    'eval',
-    'gzinflate',
-    'str_rot13',
     'file_get'
 ];
 

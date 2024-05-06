@@ -59,7 +59,7 @@ class Safezone
      */
     protected string $version;
 
-    public bool $is_pro = false;
+    public bool $is_pro = true;
 
     public array $plugin_settings;
 
@@ -143,9 +143,12 @@ class Safezone
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/lib/class-safezone-disable_comments.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/lib/class-safezone-disable_heartbeat.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/lib/class-safezone-remove_shortlink.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/lib/class-safezone-malware_scanner.php';
+
         if (file_exists(plugin_dir_path(dirname(__FILE__)) . 'includes/class-safezone-pro.php')) {
             require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-safezone-pro.php';
         }
+
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-safezone-loader.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-safezone-checker.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-safezone-i18n.php';
@@ -185,13 +188,17 @@ class Safezone
 
         $plugin_admin = new Safezone_Admin($this->get_plugin_name(), $this->get_version());
 
+        $this->loader->add_action('wp_head', $this,'add_comment_to_header', 1);
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
         $this->loader->add_action('admin_menu', $plugin_admin, 'safezone_menu');
         $this->loader->add_action('wp_ajax_save_settings', $plugin_admin, 'save_settings');
         $this->loader->add_action('wp_ajax_add_whitelist', $plugin_admin, 'add_whitelist');
+        $this->loader->add_action('wp_ajax_remove_whitelist', $plugin_admin, 'remove_whitelist');
         $this->loader->add_action('wp_ajax_add_licence', $plugin_admin, 'add_licence');
         $this->loader->add_action('wp_ajax_subscribe', $plugin_admin, 'subscribe');
+        $this->loader->add_action('wp_ajax_malware_scanner', $plugin_admin, 'malware_scanner');
+        $this->loader->add_action('wp_ajax_malware_report_ignore', $plugin_admin, 'malware_report_ignore');
 
     }
 
@@ -350,6 +357,11 @@ class Safezone
         echo '<div class="notice notice-success is-dismissible">';
         echo "<p>Kullanıcı Safe Zone'u aktif ettiğinde farklı bir güvenlik eklentiside aynı anda aktifse bunu devredışı bırakması gerektiği ile ilgili sürekli uyarı almalıdır. Bu çakışmalara ve eklentinin doğru çalışmamasına sebebiyet verebilir.</p>";
         echo '</div>';
+    }
+
+    public function add_comment_to_header(): void
+    {
+        echo '<!-- Professional Security & Firewall by Wp Safe Zone - https://wpsafezone.com/ -->';
     }
 
 }

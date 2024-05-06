@@ -127,7 +127,7 @@
                                                 </svg>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><button class="dropdown-item deleteWhitelist" type="button" data-id="123">Delete</button></li>
+                                                <li><button class="dropdown-item deleteWhitelist" type="button" data-id="<?php echo $value['id'];?>">Delete</button></li>
                                             </ul>
                                         </div>
                                     </td>
@@ -139,21 +139,41 @@
                     <div class="table-pagination">
                         <nav class="pagination-left">
                             <?php
-                                $output = '<span class="page-numbers">Page ' . $this->get_whitelist()['meta']['current_page'] . ' of ' . $this->get_whitelist()['meta']['total_pages'] . '</span>';
+                            $current_page = $this->get_whitelist()['meta']['current_page'];
+                            $total_pages = $this->get_whitelist()['meta']['total_pages'];
 
-                                $output .= '<ul class="pagination">';
-                                if ($this->get_whitelist()['meta']['total_pages'] > 1) {
-                                    $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', max(1, $this->get_whitelist()['meta']['current_page'] - 1))) . '">&laquo; Prev</a></li>';
+                            $output = '<span class="page-numbers">Page ' . $current_page . ' of ' . $total_pages . '</span>';
+                            $output .= '<ul class="pagination">';
 
-                                    for ($i = 1; $i <= $this->get_whitelist()['meta']['total_pages']; $i++) {
-                                        $output .= '<li class="page-item"><a class="page-link ' . ($i == $this->get_whitelist()['meta']['current_page'] ? 'active' : '') . '" href="' . esc_url(add_query_arg('p', $i)) . '">'.$i.'</a></li>';
-                                    }
+                            if ($total_pages > 1) {
+                                $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', max(1, $current_page - 1))) . '">&laquo; Prev</a></li>';
 
-                                    $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', min($this->get_whitelist()['meta']['total_pages'], $this->get_whitelist()['meta']['current_page'] + 1))) . '">Next &raquo;</a></li>';
+                                // Show page numbers with ellipsis
+                                $num_pages_to_show = 5;
+
+                                // Calculate start and end page numbers
+                                $start_page = max(1, $current_page - floor($num_pages_to_show / 2));
+                                $end_page = min($total_pages, $start_page + $num_pages_to_show - 1);
+
+                                // Show ellipsis if necessary
+                                if ($start_page > 1) {
+                                    $output .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
                                 }
 
-                                $output .= '</ul>';
-                                echo $output;
+                                // Show page numbers
+                                for ($i = $start_page; $i <= $end_page; $i++) {
+                                    $output .= '<li class="page-item"><a class="page-link ' . ($i == $current_page ? 'active' : '') . '" href="' . esc_url(add_query_arg('p', $i)) . '">'.$i.'</a></li>';
+                                }
+
+                                // Show ellipsis if necessary
+                                if ($end_page < $total_pages) {
+                                    $output .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                }
+
+                                $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', min($total_pages, $current_page + 1))) . '">Next &raquo;</a></li>';
+                            }
+                            $output .= '</ul>';
+                            echo $output;
                             ?>
                         </nav>
                     </div>
@@ -161,9 +181,7 @@
             </div>
         </div>
         <div class="app__body-sidebar">
-
             <div class="sidebar">
-
                 <div class="sz-card">
                     <div class="sz-card-order">
                         <div class="sz-card-order__heading">
@@ -171,32 +189,16 @@
                             <div class="sz-card-order__heading-text">Based on the entire year</div>
                         </div>
                         <div class="sz-card-order__list">
-
-                            <div class="sz-card-order__item">
-                                <a href="/" class="sz-card-order__item-value shadow-none">245.252.75.94</a>
-                                <span class="sz-card-order__item-text"><span class="text-gray-40">09/03/2023</span></span>
-                            </div>
-
-                            <div class="sz-card-order__item">
-                                <a href="/" class="sz-card-order__item-value shadow-none">245.252.75.94</a>
-                                <span class="sz-card-order__item-text"><span class="text-gray-40">09/03/2023</span></span>
-                            </div>
-
-                            <div class="sz-card-order__item">
-                                <a href="/" class="sz-card-order__item-value shadow-none">245.252.75.94</a>
-                                <span class="sz-card-order__item-text"><span class="text-gray-40">09/03/2023</span></span>
-                            </div>
-
-                            <div class="sz-card-order__item">
-                                <a href="/" class="sz-card-order__item-value shadow-none">245.252.75.94</a>
-                                <span class="sz-card-order__item-text"><span class="text-gray-40">09/03/2023</span></span>
-                            </div>
-
-                            <div class="sz-card-order__item">
-                                <a href="/" class="sz-card-order__item-value shadow-none">245.252.75.94</a>
-                                <span class="sz-card-order__item-text"><span class="text-gray-40">09/03/2023</span></span>
-                            </div>
-
+                            <?php
+                                if(count($this->latest_5_whitelist()) > 0){
+                                    foreach($this->latest_5_whitelist() as $value) {
+                                        echo '<div class="sz-card-order__item">';
+                                            echo '<a href="/" class="sz-card-order__item-value shadow-none">'.$value['ip_address'].'</a>';
+                                            echo '<span class="sz-card-order__item-text"><span class="text-gray-40">'.date('j M Y H:i', strtotime($value['created_at'])).'</span></span>';
+                                        echo '</div>';
+                                    }
+                                }
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -204,12 +206,12 @@
                 <div class="sz-card sz-card-info">
                     <div class="sz-card-info__main">
                         <div class="sz-card-info__value">
-                            <span class="sz-card-info__value-text">246</span>
+                            <span class="sz-card-info__value-text"><?php echo $this->total_whitelist();?></span>
                             <span>
-                    <svg class="icon">
-                      <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#admin-network"></use>
-                    </svg>
-                  </span>
+                                <svg class="icon">
+                                  <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#admin-network"></use>
+                                </svg>
+                            </span>
                         </div>
                         <div class="sz-card-info__content">
                             <div class="sz-card-info__content-title">Allowed IPs</div>
@@ -217,17 +219,17 @@
                         </div>
                     </div>
 
-                    <div class="sz-card-info__actions">
-
-                        <select class="form-select form-select-sm" aria-label="info select">
-
-                            <option value="1" selected="selected">Today</option>
-
-                            <option value="2">Today</option>
-
-                        </select>
-
-                    </div>
+<!--                    <div class="sz-card-info__actions">-->
+<!---->
+<!--                        <select class="form-select form-select-sm" aria-label="info select">-->
+<!---->
+<!--                            <option value="1" selected="selected">Today</option>-->
+<!---->
+<!--                            <option value="2">Today</option>-->
+<!---->
+<!--                        </select>-->
+<!---->
+<!--                    </div>-->
 
                 </div>
 

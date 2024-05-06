@@ -39,6 +39,7 @@ if (!class_exists('Safezone_Login_Protection')) {
             $transient = get_transient('limit_login_attempt');
             if ($transient) {
                 $attempts = $transient + 1;
+                //TODO: API blacklist store
                 set_transient('limit_login_attempt', $attempts);
             } else {
                 set_transient('limit_login_attempt', 1, $this->seconds_locked);

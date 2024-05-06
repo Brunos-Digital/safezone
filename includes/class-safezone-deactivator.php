@@ -64,6 +64,7 @@ class Safezone_Deactivator {
 
         global $wpdb;
         $wpdb->query("DROP TABLE IF EXISTS wp_sz_whitelist");
+        $wpdb->query("DROP TABLE IF EXISTS wp_sz_malware_reports");
 
         $response = wp_remote_post(API_URL . '/plugins/deactivate');
 	}

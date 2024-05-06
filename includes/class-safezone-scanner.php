@@ -51,9 +51,10 @@ if (!class_exists('Safezone_Scanner')) {
                 'time' => number_format(microtime(true) - $this->startTime, 4) . ' sec',
                 'wordpress_version' => get_bloginfo('version'),
                 'rules' => $this->keywords,
+                // TODO: Add 'excludes' key to the array
+                'excludes' => [],
                 'results' => $this->results,
             ];
         }
-
     }
 }

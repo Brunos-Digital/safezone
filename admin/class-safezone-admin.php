@@ -328,16 +328,20 @@ class Safezone_Admin
         $whitelist = $_POST['payload'] ?? '';
 
         if (empty($whitelist['ip'])) {
-            wp_send_json_error([
-                'message' => 'IP is required.'
+            wp_send_json([
+                'message' => 'IP is required.',
+                'success' => false,
+                'data' => []
             ]);
         }
 
         $response = $this->ip_details($whitelist['ip']);
 
         if (!$response) {
-            wp_send_json_error([
-                'message' => 'Invalid IP.'
+            wp_send_json([
+                'success' => false,
+                'message' => 'Invalid IP.',
+                'data' => []
             ]);
         }
 
@@ -350,18 +354,32 @@ class Safezone_Admin
         }
 
         if ($response['ip'] == "") {
-            wp_send_json_error([
-                'message' => 'Invalid IP.'
+            wp_send_json([
+                'success' => false,
+                'message' => 'Invalid IP.',
+                'data' => []
             ]);
         }
 
         if ($response['country'] == "") {
-            wp_send_json_error([
-                'message' => 'Invalid Country.'
+            wp_send_json([
+                'success' => false,
+                'message' => 'Invalid Country.',
+                'data' => []
             ]);
         }
 
         global $wpdb;
+        // check wp_sz_whitelist
+        $check = $wpdb->get_row("SELECT * FROM wp_sz_whitelist WHERE ip_address = '{$response['ip']}'");
+        if ($check) {
+            wp_send_json([
+                'success' => false,
+                'message' => 'IP already exists in whitelist.',
+                'data' => []
+            ]);
+        }
+
         $insert = $wpdb->insert('wp_sz_whitelist', [
             'ip_address' => $response['ip'],
             'country_code' => $response['country'],
@@ -375,13 +393,46 @@ class Safezone_Admin
         ]);
 
         if (!$insert) {
-            wp_send_json_error([
-                'message' => 'Failed to add IP to whitelist.'
+            wp_send_json([
+                'success' => false,
+                'message' => 'Failed to add IP to whitelist.',
+                'data' => []
             ]);
         }
 
-        wp_send_json_success([
-            'message' => 'IP added to whitelist successfully.'
+        wp_send_json([
+            'success' => true,
+            'message' => 'IP added to whitelist successfully.',
+            'data' => []
+        ]);
+    }
+
+    // Delete Whitelist
+    public function remove_whitelist(): void
+    {
+        $whitelist = $_POST['payload'] ?? '';
+        if (empty($whitelist['id'])) {
+            wp_send_json([
+                'message' => 'ID is required.',
+                'success' => false,
+                'data' => []
+            ]);
+        }
+
+        global $wpdb;
+        $delete = $wpdb->delete('wp_sz_whitelist', ['id' => $whitelist['id']]);
+        if (!$delete) {
+            wp_send_json([
+                'success' => false,
+                'message' => 'Failed to delete IP from whitelist.',
+                'data' => []
+            ]);
+        }
+
+        wp_send_json([
+            'success' => true,
+            'message' => 'IP deleted from whitelist successfully.',
+            'data' => []
         ]);
     }
 
@@ -434,14 +485,8 @@ class Safezone_Admin
             ]);
         }
 
-        $website = $_POST['payload']['website'] ?? '';
-        if ($website == "") {
-            wp_send_json([
-                'success' => false,
-                'message' => 'Website is required',
-                'data' => []
-            ]);
-        }
+        $website = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . '://' . wp_parse_url(home_url())['host'];
+
         $response = wp_remote_post(API_URL . '/subscription/subscribe', [
             'body' => [
                 'email' => $email,
@@ -469,5 +514,107 @@ class Safezone_Admin
             'message' => $response_body['message'],
             'data' => $response_body['data']
         ]);
+    }
+
+    public function total_whitelist(): int
+    {
+        global $wpdb;
+        return $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_whitelist") ?? 0;
+    }
+
+    public function latest_5_whitelist(): array
+    {
+        global $wpdb;
+        return $wpdb->get_results("SELECT * FROM wp_sz_whitelist ORDER BY created_at DESC LIMIT 5", ARRAY_A) ?? [];
+    }
+
+    public function malware_reports() : array
+    {
+        global $wpdb;
+        $page_number = isset($_GET['p']) ? absint($_GET['p']) : 1;
+        $items_per_page = 10;
+        $offset = ($page_number - 1) * $items_per_page;
+        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_malware_reports WHERE status != 'Ignored'");
+        $query = $wpdb->prepare("SELECT * FROM wp_sz_malware_reports WHERE status != 'Ignored' ORDER BY created_at DESC LIMIT %d, %d", $offset, $items_per_page);
+        return [
+            'data' => $wpdb->get_results($query, ARRAY_A),
+            'meta' => [
+                'total_count' => $total_count,
+                'total_pages' => ceil($total_count / $items_per_page),
+                'current_page' => $page_number
+            ]
+        ];
+    }
+
+    public function malware_report_badge($par): array
+    {
+        if($par === 'Critical'){
+            return ['error', 'Critical'];
+        }elseif ($par === 'Suspicious') {
+            return ['warning', 'Warning'];
+        }elseif ($par === 'Fixed') {
+            return ['success', 'Fixed'];
+        }
+    }
+
+    public function malware_report_details($id): array
+    {
+        global $wpdb;
+        return $wpdb->get_row("SELECT * FROM wp_sz_malware_reports WHERE id = {$id}", ARRAY_A) ?? [];
+    }
+
+    public function malware_report_ignore(): void
+    {
+        $malware = $_POST['payload'] ?? '';
+        if (empty($malware['id'])) {
+            wp_send_json([
+                'message' => 'ID is required.',
+                'success' => false,
+                'data' => []
+            ]);
+        }
+
+        global $wpdb;
+        $update = $wpdb->update('wp_sz_malware_reports', ['status' => 'Ignored'], ['id' => $malware['id']]);
+        if (!$update) {
+            wp_send_json([
+                'success' => false,
+                'message' => 'Failed to ignore malware report.',
+                'data' => []
+            ]);
+        }
+
+        wp_send_json([
+            'success' => true,
+            'message' => 'Malware report ignored successfully.',
+            'data' => []
+        ]);
+    }
+
+    public function malware_scanner(): void
+    {
+        $step = $_POST['step'];
+        if ($step == 1) {
+            $response = (new Safezone_Malware_Scanner)->step1Checking();
+            wp_send_json([
+                'success' => true,
+                'message' => 'Spamvertising Check Passed',
+                'data' => []
+            ]);
+        }elseif($step == 2){
+            $response = (new Safezone_Malware_Scanner)->step2Checking();
+            wp_send_json([
+                'success' => true,
+                'message' => 'Blacklist Check Passed',
+                'data' => []
+            ]);
+        }elseif($step == 3) {
+            $response = (new Safezone_Malware_Scanner)->step3Checking();
+            wp_send_json([
+                'success' => true,
+                'message' => 'Spam Check Passed',
+                'data' => []
+            ]);
+        }
     }
 }

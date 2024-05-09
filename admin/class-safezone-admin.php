@@ -66,6 +66,8 @@ class Safezone_Admin
 
         $this->plugin_settings = get_options([
             'sz_licence',
+            'sz_firewall',
+            'sz_anti_spam',
             'sz_disable_embeds',
             'sz_disable_xml',
             'sz_hide_wp_version',
@@ -528,14 +530,14 @@ class Safezone_Admin
         return $wpdb->get_results("SELECT * FROM wp_sz_whitelist ORDER BY created_at DESC LIMIT 5", ARRAY_A) ?? [];
     }
 
-    public function malware_reports() : array
+    public function reports($scan_type) : array
     {
         global $wpdb;
         $page_number = isset($_GET['p']) ? absint($_GET['p']) : 1;
-        $items_per_page = 10;
+        $items_per_page = 24;
         $offset = ($page_number - 1) * $items_per_page;
-        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_malware_reports WHERE status != 'Ignored'");
-        $query = $wpdb->prepare("SELECT * FROM wp_sz_malware_reports WHERE status != 'Ignored' ORDER BY created_at DESC LIMIT %d, %d", $offset, $items_per_page);
+        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_reports WHERE status = 'Pending' AND scan_type = '$scan_type'");
+        $query = $wpdb->prepare("SELECT * FROM wp_sz_reports WHERE status != 'Ignored' AND scan_type = '$scan_type' ORDER BY created_at DESC LIMIT %d, %d", $offset, $items_per_page);
         return [
             'data' => $wpdb->get_results($query, ARRAY_A),
             'meta' => [
@@ -546,21 +548,23 @@ class Safezone_Admin
         ];
     }
 
-    public function malware_report_badge($par): array
+    public function state_badge($par): array
     {
-        if($par === 'Critical'){
-            return ['error', 'Critical'];
-        }elseif ($par === 'Suspicious') {
-            return ['warning', 'Warning'];
-        }elseif ($par === 'Fixed') {
-            return ['success', 'Fixed'];
-        }
+        $statuses = [
+            'Critical' => ['error', 'Critical'],
+            'Suspicious' => ['warning', 'Warning'],
+            'Fixed' => ['success', 'Fixed'],
+            'Low' => ['info', 'Low'],
+            'Medium' => ['warning', 'Medium'],
+            'Comment' => ['error', 'Comment']
+        ];
+        return $statuses[$par] ?? ['error', 'High'];
     }
 
     public function malware_report_details($id): array
     {
         global $wpdb;
-        return $wpdb->get_row("SELECT * FROM wp_sz_malware_reports WHERE id = {$id}", ARRAY_A) ?? [];
+        return $wpdb->get_row("SELECT * FROM wp_sz_reports WHERE id = {$id}", ARRAY_A) ?? [];
     }
 
     public function malware_report_ignore(): void
@@ -575,7 +579,7 @@ class Safezone_Admin
         }
 
         global $wpdb;
-        $update = $wpdb->update('wp_sz_malware_reports', ['status' => 'Ignored'], ['id' => $malware['id']]);
+        $update = $wpdb->update('wp_sz_reports', ['status' => 'Ignored'], ['id' => $malware['id']]);
         if (!$update) {
             wp_send_json([
                 'success' => false,
@@ -593,28 +597,117 @@ class Safezone_Admin
 
     public function malware_scanner(): void
     {
-        $step = $_POST['step'];
-        if ($step == 1) {
-            $response = (new Safezone_Malware_Scanner)->step1Checking();
-            wp_send_json([
-                'success' => true,
-                'message' => 'Spamvertising Check Passed',
-                'data' => []
-            ]);
-        }elseif($step == 2){
-            $response = (new Safezone_Malware_Scanner)->step2Checking();
-            wp_send_json([
-                'success' => true,
-                'message' => 'Blacklist Check Passed',
-                'data' => []
-            ]);
-        }elseif($step == 3) {
-            $response = (new Safezone_Malware_Scanner)->step3Checking();
-            wp_send_json([
-                'success' => true,
-                'message' => 'Spam Check Passed',
-                'data' => []
-            ]);
+        (new Safezone_Malware_Scanner())->scanner();
+        wp_send_json([
+            'success' => true,
+            'message' => 'Malware scanner completed.',
+            'data' => []
+        ]);
+    }
+
+    public function protection_status(): void
+    {
+        if(isset($_POST['payload']['status']) && in_array($_POST['payload']['status'], ['1', '0'])){
+            if ($_POST['payload']['type'] == 'firewall') {
+                $status = $_POST['payload']['status'];
+                update_option('sz_firewall', $status);
+                wp_send_json([
+                    'success' => true,
+                    'message' => 'Protection status updated successfully.',
+                    'data' => []
+                ]);
+            } else if ($_POST['payload']['type'] == 'anti_spam') {
+                $status = $_POST['payload']['status'];
+                update_option('sz_anti_spam', $status);
+                wp_send_json([
+                    'success' => true,
+                    'message' => 'Protection status updated successfully.',
+                    'data' => []
+                ]);
+            }
         }
+    }
+
+    public function get_malware_overview(): array
+    {
+        global $wpdb;
+        $reports = $wpdb->get_results("SELECT * FROM wp_sz_reports WHERE status != 'Ignored' AND scan_type = 'Malware' ORDER BY created_at DESC", ARRAY_A);
+        $overview = [
+            'step_1' => false,
+            'step_2' => false,
+            'step_3' => false,
+            'step_4' => false,
+            'step_5' => false,
+            'step_6' => false,
+            'step_7' => false
+        ];
+        foreach ($reports as $report) {
+            if($report['step'] === "1"){
+                $overview['step_1'] = true;
+            }
+            if($report['step'] === "2"){
+                $overview['step_2'] = true;
+            }
+            if($report['step'] === "3"){
+                $overview['step_3'] = true;
+            }
+            if($report['step'] === "4"){
+                $overview['step_4'] = true;
+            }
+            if($report['step'] === "5"){
+                $overview['step_5'] = true;
+            }
+            if($report['step'] === "6"){
+                $overview['step_6'] = true;
+            }
+            if($report['step'] === "7"){
+                $overview['step_7'] = true;
+            }
+        }
+
+        return [
+            [
+                'name' => 'Spamvertising Check',
+                'step' => '1',
+                'status' => $overview['step_1'] ? 'failed' : 'succsess',
+                'icon' => $overview['step_1'] ? 'info-outline' : 'yes'
+            ],
+            [
+                'name' => 'Blacklist Check',
+                'step' => '2',
+                'status' => $overview['step_2'] ? 'failed' : 'succsess',
+                'icon' => $overview['step_2'] ? 'info-outline' : 'yes'
+            ],
+            [
+                'name' => 'Spam Check',
+                'step' => '3',
+                'status' => $overview['step_3'] ? 'failed' : 'succsess',
+                'icon' => $overview['step_3'] ? 'info-outline' : 'yes'
+            ],
+            [
+                'name' => 'Vulnerability Scan',
+                'step' => '4',
+                'status' => $overview['step_4'] ? 'failed' : 'succsess',
+                'icon' => $overview['step_4'] ? 'info-outline' : 'yes'
+            ],
+            [
+                'name' => 'Malware Scan',
+                'step' => '5',
+                'status' => $overview['step_5'] ? 'failed' : 'succsess',
+                'icon' => $overview['step_5'] ? 'info-outline' : 'yes'
+            ],
+            [
+                'name' => 'Public Files',
+                'step' => '6',
+                'status' => $overview['step_6'] ? 'failed' : 'succsess',
+                'icon' => $overview['step_6'] ? 'info-outline' : 'yes'
+            ],
+            [
+                'name' => 'Content Safety',
+                'step' => '7',
+                'status' => $overview['step_7'] ? 'failed' : 'succsess',
+                'icon' => $overview['step_7'] ? 'info-outline' : 'yes'
+            ]
+        ];
     }
 }

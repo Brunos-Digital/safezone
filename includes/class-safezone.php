@@ -83,6 +83,8 @@ class Safezone
         $this->define_public_hooks();
         $this->plugin_settings = get_options([
             'sz_licence',
+            'sz_firewall',
+            'sz_anti_spam',
             'sz_disable_embeds',
             'sz_disable_xml',
             'sz_hide_wp_version',
@@ -144,10 +146,14 @@ class Safezone
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/lib/class-safezone-disable_heartbeat.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/lib/class-safezone-remove_shortlink.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/lib/class-safezone-malware_scanner.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/lib/class-safezone-anti_spam.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/lib/class-safezone-firewall.php';
 
         if (file_exists(plugin_dir_path(dirname(__FILE__)) . 'includes/class-safezone-pro.php')) {
             require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-safezone-pro.php';
         }
+
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-safezone-report.php';
 
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-safezone-loader.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-safezone-checker.php';
@@ -199,6 +205,7 @@ class Safezone
         $this->loader->add_action('wp_ajax_subscribe', $plugin_admin, 'subscribe');
         $this->loader->add_action('wp_ajax_malware_scanner', $plugin_admin, 'malware_scanner');
         $this->loader->add_action('wp_ajax_malware_report_ignore', $plugin_admin, 'malware_report_ignore');
+        $this->loader->add_action('wp_ajax_protection_status', $plugin_admin, 'protection_status');
 
     }
 
@@ -277,6 +284,7 @@ class Safezone
 
     public function initial(): void
     {
+        $this->loader->add_action('init', $this, 'check_user_in_door');
         $this->update_checker();
 
         if ($this->plugin_settings['sz_login_protection'] === '1') {
@@ -319,6 +327,13 @@ class Safezone
             new Safezone_Remove_Shortlink();
         }
 
+        if ($this->plugin_settings['sz_firewall'] === '1') {
+            Safezone_Firewall::add_htaccess_lines();
+        }else{
+            Safezone_Firewall::remove_htaccess_lines();
+        }
+
+        $this->loader->add_action('transition_comment_status', $this, 'my_comment_spam_detection', 10, 3);
         $this->loader->add_action('manage_users_columns', $this, 'new_modify_user_table');
         $this->loader->add_filter('manage_users_custom_column', $this, 'new_modify_user_table_row');
         $this->loader->add_action('admin_notices', $this, 'sample_admin_notice__success');
@@ -327,6 +342,12 @@ class Safezone
             if (class_exists('Safezone_Pro')) {
                 $this->is_pro = Safezone_Pro::licence();
             }
+        }
+    }
+
+    public function my_comment_spam_detection( $new_status, $old_status, $comment ) {
+        if ( $new_status == 'spam' ) {
+            $this->addReport("Spam comment blocked: $comment->comment_ID", "Comment", $comment->comment_author_IP, $this->ip_details($comment->comment_author_IP)['country']);
         }
     }
 
@@ -364,4 +385,51 @@ class Safezone
         echo '<!-- Professional Security & Firewall by Wp Safe Zone - https://wpsafezone.com/ -->';
     }
 
+    public function addReport($message, $state, $ip_address=null, $country=null): void
+    {
+        global $wpdb;
+        $check = $wpdb->get_row("SELECT * FROM wp_sz_reports WHERE message = '$message' AND state = '$state' AND scan_type = 'Anti-Spam'");
+        if(!$check){
+            $wpdb->insert('wp_sz_reports', [
+                'message' => str_replace(['//'],['/'],$message),
+                'state' => $state,
+                'is_fixed' => false,
+                'scan_type' => 'Anti-Spam',
+                'created_ip' => $ip_address,
+                'created_country' => $country
+            ]);
+        }
+    }
+
+    private function ip_details($ip) : array
+    {
+        $json = file_get_contents("https://ipinfo.io/{$ip}/geo");
+        return json_decode($json, true);
+    }
+
+    private function ip_details_free() : array
+    {
+        $api_url = "https://1.1.1.1/cdn-cgi/trace";
+        $response = file_get_contents($api_url);
+        $lines = explode("\n", $response);
+        $ip_details = array();
+        foreach ($lines as $line) {
+            $parts = explode("=", $line);
+            $key = trim($parts[0]);
+            $value = trim($parts[1]);
+            $ip_details[$key] = $value;
+        }
+
+        return $ip_details;
+    }
+
+    public function check_user_in_door() : void
+    {
+        $check = Safezone_Firewall::get_user_info_check();
+        if(!$check){
+            $this->addReport('User is blocked.', 'Blocked', $_SERVER['REMOTE_ADDR'], $this->ip_details($_SERVER['REMOTE_ADDR'])['country']);
+            wp_redirect('https://google.com');
+            exit();
+        }
+    }
 }

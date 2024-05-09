@@ -33,6 +33,11 @@ class Safezone_Deactivator {
     {
         delete_option('sz_licence');
 
+        delete_option('sz_firewall');
+        delete_option('sz_anti_spam');
+
+        delete_option('sz_last_malware_scan');
+
         delete_option('sz_disable_embeds');
         delete_option('sz_disable_xml');
         delete_option('sz_hide_wp_version');
@@ -64,7 +69,7 @@ class Safezone_Deactivator {
 
         global $wpdb;
         $wpdb->query("DROP TABLE IF EXISTS wp_sz_whitelist");
-        $wpdb->query("DROP TABLE IF EXISTS wp_sz_malware_reports");
+        $wpdb->query("DROP TABLE IF EXISTS wp_sz_reports");
 
         $response = wp_remote_post(API_URL . '/plugins/deactivate');
 	}

@@ -355,7 +355,11 @@ class Safezone
 
     public function my_comment_spam_detection( $new_status, $old_status, $comment ) {
         if ( $new_status == 'spam' ) {
-            $this->addReport("Spam comment blocked: $comment->comment_ID", "Comment", $comment->comment_author_IP, $this->ip_details($comment->comment_author_IP)['country']);
+            Safezone_Report::add("Spam comment blocked: $comment->comment_ID", null, "Comment", "Anti-Spam", null, [
+                'ip' => $this->ip_details['ip'],
+                'country_code' => $this->ip_details['loc'],
+                'country_name' => null
+            ]);
         }
     }
 
@@ -391,22 +395,6 @@ class Safezone
     public function add_comment_to_header(): void
     {
         echo '<!-- Professional Security & Firewall by Wp Safe Zone - https://wpsafezone.com/ -->';
-    }
-
-    public function addReport($message, $state, $ip_address=null, $country=null): void
-    {
-        global $wpdb;
-        $check = $wpdb->get_row("SELECT * FROM wp_sz_reports WHERE message = '$message' AND state = '$state' AND scan_type = 'Anti-Spam'");
-        if(!$check){
-            $wpdb->insert('wp_sz_reports', [
-                'message' => str_replace(['//'],['/'],$message),
-                'state' => $state,
-                'is_fixed' => false,
-                'scan_type' => 'Anti-Spam',
-                'created_ip' => $ip_address,
-                'created_country' => $country
-            ]);
-        }
     }
 
     private function ip_details($ip) : array

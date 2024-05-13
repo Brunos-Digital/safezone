@@ -45,16 +45,14 @@
 
                         <div class="foundation-panel__actions-switch">
                             <label class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" checked="checked">
+                                <input class="form-check-input protection_change" data-type="firewall" type="checkbox" role="switch" <?php echo get_option('sz_firewall') === "0" ? '' : 'checked="true"'?>>
                                 <span class="form-check-label">Firewall</span>
                             </label>
                             <a href="<?php echo admin_url('admin.php?page=safezone-settings&tab=firewall');?>" class="btn btn-white btn-icon">
                                 Settings
-
                                 <svg class="icon">
                                     <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#admin-tools"></use>
                                 </svg>
-
                             </a>
                         </div>
 
@@ -67,7 +65,7 @@
                     <div class="sz-card sz-card-info">
                         <div class="sz-card-info__main">
                             <div class="sz-card-info__value">
-                                <span class="sz-card-info__value-text">12</span>
+                                <span class="sz-card-info__value-text"><?php echo $this->bad_bots;?></span>
                                 <span>
                       <svg class="icon">
                         <use xlink:href="images/icons.svg#admin-users"></use>
@@ -97,7 +95,7 @@
                     <div class="sz-card sz-card-info">
                         <div class="sz-card-info__main">
                             <div class="sz-card-info__value">
-                                <span class="sz-card-info__value-text">34</span>
+                                <span class="sz-card-info__value-text"><?php echo $this->login_protection;?></span>
                                 <span>
                       <svg class="icon">
                         <use xlink:href="images/icons.svg#admin-network"></use>

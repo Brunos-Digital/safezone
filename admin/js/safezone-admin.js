@@ -60,18 +60,31 @@ const failed_icon = '<div class="foundation-status__item-icon foundation-status_
             });
         });
 
-        $('.malwareScan').on('click', function (e) {
+        $('.malwareScan').on('click', async function (e) {
             e.preventDefault();
-            $(this).prop('disabled', true);
-            toastify('success', 'Scanning...');
-            scanForMalware(1);
+            const $this = $(this);
+            $this.prop('disabled', true);
+            $this.html('Scanning...');
+            $('#malware_status').hide();
+            await $.post(ajaxurl, {action: 'malware_scanner'}, function (response) {
+                if (response.success) {
+                    window.location.reload();
+                }else{
+                    toastify('error', response.message);
+                    $('#malware_status').show();
+                }
+            }).fail(function (xhr, status, error) {
+                toastify('error', status + " : " + error);
+                $('#malware_status').show();
+            });
         });
 
         $('.malware_report_ignore').on('click', function (e) {
             e.preventDefault();
             const $this = $(this);
             $.post(ajaxurl, {
-                action: 'malware_report_ignore', payload: {
+                action: 'malware_report_ignore',
+                payload: {
                     id: $this.data('id')
                 }
             }, function (response) {
@@ -86,6 +99,25 @@ const failed_icon = '<div class="foundation-status__item-icon foundation-status_
                 toastify('error', status + " : " + error);
             })
         });
+
+        $('.protection_change').on('change', function(e) {
+            e.preventDefault();
+            const $this = $(this);
+            const status = $this.is(':checked') ? "1" : "0";
+            const type = $this.data('type');
+            $.post(ajaxurl, {action: 'protection_status', payload: {status: status, type: type}}, function (response) {
+                if (response.success) {
+                    $this.closest('.form-check-reverse').find('span').html(status === "1" ? "Active" : "Disabled")
+                    toastify('success', response.message);
+                } else {
+                    toastify('error', response.message);
+                }
+            }).fail(function (xhr, status, error) {
+                toastify('error', status + " : " + error);
+            });
+        })
+
+
     });
 
     const $post = (url, action, payload) => {
@@ -98,26 +130,6 @@ const failed_icon = '<div class="foundation-status__item-icon foundation-status_
         }).fail(function (xhr, status, error) {
             toastify('error', status + " : " + error);
         })
-    }
-
-    const scanForMalware = (step) => {
-        $.post(ajaxurl, {action: 'malware_scanner', step: step}, function (response) {
-            const $step = $('#step_' + step + '_response');
-            if (response.success) {
-                toastify('success', response.message);
-                $step.html(success_icon).show();
-                if (step < 3) {
-                    scanForMalware(step + 1); // Recursive call for next step
-                } else {
-                    $('#malware_status').show();
-                    window.location.reload();
-                }
-            } else {
-                $step.html(failed_icon).show();
-            }
-        }).fail(function (xhr, status, error) {
-            toastify('error', status + " : " + error);
-        });
     }
 
     const toastify = (status, response) => {
@@ -139,5 +151,4 @@ const failed_icon = '<div class="foundation-status__item-icon foundation-status_
             } // Callback after click
         }).showToast();
     }
-
 })(jQuery);

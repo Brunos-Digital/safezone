@@ -11,6 +11,14 @@
  * @package    Safezone
  * @subpackage Safezone/admin/partials
  */
+
+
+if ( ! defined( 'WPINC' ) ) {
+    die;
+}
+
+$get_reports = $this->reports('Anti-Spam');
+
 ?>
 
 <div class="app">
@@ -24,28 +32,28 @@
                     <div class="tab-menu__bottom">
 
                         <div class="actions">
-                            <label class="input-group">
-                                <span class="input-group-icon">
-
-                                  <svg class="icon">
-                                    <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#search"></use>
-                                  </svg>
-
-                                </span>
-                                <input type="text" class="form-control" placeholder="Search for IP or hostname" aria-label="search">
-                            </label>
-                            <select class="actions-select" aria-label="actives">
-                                <option value="1" selected="selected">All activites</option>
-                                <option value="2">All activites</option>
-                            </select>
-                            <button class="btn btn-icon btn-blue-40">
-
-                                <svg class="icon">
-                                    <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#filter"></use>
-                                </svg>
-
-                                Filters
-                            </button>
+<!--                            <label class="input-group">-->
+<!--                                <span class="input-group-icon">-->
+<!---->
+<!--                                  <svg class="icon">-->
+<!--                                    <use xlink:href="--><?php //echo SAFEZONE_PLUGIN_URL; ?><!--/admin/images/icons.svg#search"></use>-->
+<!--                                  </svg>-->
+<!---->
+<!--                                </span>-->
+<!--                                <input type="text" class="form-control" placeholder="Search for IP or hostname" aria-label="search">-->
+<!--                            </label>-->
+<!--                            <select class="actions-select" aria-label="actives">-->
+<!--                                <option value="1" selected="selected">All activites</option>-->
+<!--                                <option value="2">All activites</option>-->
+<!--                            </select>-->
+<!--                            <button class="btn btn-icon btn-blue-40">-->
+<!---->
+<!--                                <svg class="icon">-->
+<!--                                    <use xlink:href="--><?php //echo SAFEZONE_PLUGIN_URL; ?><!--/admin/images/icons.svg#filter"></use>-->
+<!--                                </svg>-->
+<!---->
+<!--                                Filters-->
+<!--                            </button>-->
                             <button class="btn btn-icon btn-blue-5 ms-sm-auto">
 
                                 <svg class="icon">
@@ -94,7 +102,7 @@
 
                                 <th class="" style="width: 64px; min-width: ; max-width:">
 
-                                    <input type="checkbox" class="form-check-input" aria-label="select all" checked="checked" data-table-checkbox>
+                                    <input type="checkbox" class="form-check-input" aria-label="select all" data-table-checkbox>
 
                                 </th>
 
@@ -104,28 +112,26 @@
 
                                 </th>
 
-                                <th class="" style="width: ; min-width: ; max-width: 118px">
+                                <th class="" style="width: ; min-width: 118px; max-width:">
 
                                     <span>Country</span>
 
                                 </th>
 
-                                <th class="" style="width: ; min-width: ; max-width: 150px">
+                                <th class="" style="width: ; min-width: 150px; max-width:">
 
                                     <span>Hostname</span>
 
                                 </th>
 
-                                <th class="" style="width: ; min-width: ; max-width: 145px">
+                                <th class="" style="width: auto; min-width: ; max-width:">
 
-                                    <span>Expires</span>
+                                    <span>Event</span>
 
                                 </th>
 
-                                <th class="" style="width: auto; min-width: ; max-width:">
-
-                                    <span>Reason</span>
-
+                                <th class="" style="width: ; min-width: 145px; max-width:">
+                                    <span>Created At</span>
                                 </th>
 
                                 <th class="" style="width: 64px; min-width: ; max-width:">
@@ -138,467 +144,61 @@
 
                             <tbody class="table-body">
 
-                            <tr>
-
-                                <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" checked="checked" data-table-checkbox>
-
-                                </td>
-
-                                <td>
-
-                                    <a href="#" class="text-blue-40 shadow-none">89.1.34.149</a>
-
-                                </td>
-
-                                <td>
-
-                        <span class="table-main__lang">
-                          <img class="table-main__lang-flag" src="/images/flags/TR.svg" alt="flag">
-                          <span class="table-main__lang-name">
-                            Turkey
-                          </span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex flex-column">
-
-                                        <div class="text-gray-40">185.119.721.40.</div>
-
-                                        <div class="text-gray-40">ip.godaddy.com</div>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <span>09 March 2023, 6:34:24 PM</span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex gap-2 flex-wrap align-items-center">
-
-                          <span class="badge badge--error" title="Multiple failed login attempts">
-
-                            <span class="badge__text">Multiple failed login attempts</span>
-                          </span>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" checked="checked" data-table-checkbox>
-
-                                </td>
-
-                                <td>
-
-                                    <a href="#" class="text-blue-40 shadow-none">72.146.130.60</a>
-
-                                </td>
-
-                                <td>
-
-                        <span class="table-main__lang">
-                          <img class="table-main__lang-flag" src="/images/flags/TO.svg" alt="flag">
-                          <span class="table-main__lang-name">
-                            Tonga
-                          </span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex flex-column">
-
-                                        <div class="text-gray-40">185.119.721.40.</div>
-
-                                        <div class="text-gray-40">ip.godaddy.com</div>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <span>07 March 2023, 6:32:24 PM</span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex gap-2 flex-wrap align-items-center">
-
-                          <span class="badge badge--gray" title="Unusual activity detected">
-
-                            <span class="badge__text">Unusual activity detected</span>
-                          </span>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" checked="checked" data-table-checkbox>
-
-                                </td>
-
-                                <td>
-
-                                    <a href="#" class="text-blue-40 shadow-none">219.187.172.157</a>
-
-                                </td>
-
-                                <td>
-
-                        <span class="table-main__lang">
-                          <img class="table-main__lang-flag" src="/images/flags/TR.svg" alt="flag">
-                          <span class="table-main__lang-name">
-                            Turkey
-                          </span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex flex-column">
-
-                                        <div class="text-gray-40">185.119.721.40.</div>
-
-                                        <div class="text-gray-40">ip.godaddy.com</div>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <span>07 March 2023, 5:32:15 PM</span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex gap-2 flex-wrap align-items-center">
-
-                          <span class="badge badge--gray" title="Malicious file upload detected">
-
-                            <span class="badge__text">Malicious file upload detected</span>
-                          </span>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" checked="checked" data-table-checkbox>
-
-                                </td>
-
-                                <td>
-
-                                    <a href="#" class="text-blue-40 shadow-none">204.174.44.245</a>
-
-                                </td>
-
-                                <td>
-
-                        <span class="table-main__lang">
-                          <img class="table-main__lang-flag" src="/images/flags/QA.svg" alt="flag">
-                          <span class="table-main__lang-name">
-                            Qatar
-                          </span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex flex-column">
-
-                                        <div class="text-gray-40">185.119.721.40.</div>
-
-                                        <div class="text-gray-40">ip.godaddy.com</div>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <span>09 March 2023, 6:34:24 PM</span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex gap-2 flex-wrap align-items-center">
-
-                          <span class="badge badge--gray" title="Server resource limits exceeded">
-
-                            <span class="badge__text">Server resource limits exceeded</span>
-                          </span>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" checked="checked" data-table-checkbox>
-
-                                </td>
-
-                                <td>
-
-                                    <a href="#" class="text-blue-40 shadow-none">245.252.75.94</a>
-
-                                </td>
-
-                                <td>
-
-                        <span class="table-main__lang">
-                          <img class="table-main__lang-flag" src="/images/flags/NP.svg" alt="flag">
-                          <span class="table-main__lang-name">
-                            Nepal
-                          </span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex flex-column">
-
-                                        <div class="text-gray-40">185.119.721.40.</div>
-
-                                        <div class="text-gray-40">ip.godaddy.com</div>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <span>09 March 2023, 6:34:24 PM</span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex gap-2 flex-wrap align-items-center">
-
-                          <span class="badge badge--gray" title="Unusual activity detected">
-
-                            <span class="badge__text">Unusual activity detected</span>
-                          </span>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" checked="checked" data-table-checkbox>
-
-                                </td>
-
-                                <td>
-
-                                    <a href="#" class="text-blue-40 shadow-none">135.67.222.3</a>
-
-                                </td>
-
-                                <td>
-
-                        <span class="table-main__lang">
-                          <img class="table-main__lang-flag" src="/images/flags/GR.svg" alt="flag">
-                          <span class="table-main__lang-name">
-                            Greece
-                          </span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex flex-column">
-
-                                        <div class="text-gray-40">185.119.721.40.</div>
-
-                                        <div class="text-gray-40">ip.godaddy.com</div>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <span>09 March 2023, 6:34:24 PM</span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="d-flex gap-2 flex-wrap align-items-center">
-
-                          <span class="badge badge--gray" title="Unusual activity detected">
-
-                            <span class="badge__text">Unusual activity detected</span>
-                          </span>
-
-                                    </div>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
-                            </tr>
+                            <?php
+                            if(count($get_reports) > 0){
+                                foreach($get_reports['data'] as $key=>$value){
+                                    ?>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
+                                        </td>
+                                        <td>
+                                            <div class="text-blue-40 shadow-none"><?php echo $value['ip_address'];?></div>
+                                        </td>
+                                        <td>
+                                    <span class="table-main__lang">
+                                      <img class="table-main__lang-flag" src="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/flags/<?php echo $value['country_code'];?>.svg" alt="flag">
+                                      <span class="table-main__lang-name">
+                                        <?php echo $value['country_code'];?>
+                                      </span>
+                                    </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <div class="text-gray-40"><?php echo $value['ip_address'];?></div>
+                                                <div class="text-gray-40">-</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2 flex-wrap align-items-center">
+                                        <span class="badge badge--error" title="IP Blocked">
+                                            <span class="badge__dot"></span>
+                                            <span class="badge__text"><?php echo $value['state'];?></span>
+                                        </span>
+                                                <span class="badge badge--gray" title="Attemp to access proh...">
+                                            <span class="badge__text"><?php echo $value['message'];?></span>
+                                      </span>
+                                            </div>
+                                        </td>
+                                        <td><span><?php echo date('j M Y H:i:s', strtotime($value['created_at']));?></span></td>
+                                        <td>
+                                            <div class="table-dropdown dropdown">
+                                                <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
+
+                                                    <svg class="icon">
+                                                        <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#kebab-menu"></use>
+                                                    </svg>
+
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><button class="dropdown-item" type="button">Action</button></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                <?php } } ?>
 
                             </tbody>
 
@@ -607,15 +207,41 @@
                     </div>
                     <div class="table-pagination">
                         <nav aria-label="Table navigation">
-                            <ul class="pagination">
-                                <li class="page-item"><a class="page-link active" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item"><span class="page-link disabled">...</span></li>
-                                <li class="page-item"><a class="page-link" href="#">8</a></li>
-                                <li class="page-item"><a class="page-link" href="#">9</a></li>
-                                <li class="page-item"><a class="page-link" href="#">10</a></li>
-                            </ul>
+                            <?php
+                            $output = '<span class="page-numbers">Page ' . $get_reports['meta']['current_page'] . ' of ' . $get_reports['meta']['total_pages'] . '</span>';
+                            $output .= '<ul class="pagination">';
+                            if ($get_reports['meta']['total_pages'] > 1) {
+                                $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', max(1, $this->get_whitelist()['meta']['current_page'] - 1))) . '">&laquo; Prev</a></li>';
+
+                                // Show page numbers with ellipsis
+                                $num_pages_to_show = 5;
+                                $current_page = $get_reports['meta']['current_page'];
+                                $total_pages = $get_reports['meta']['total_pages'];
+
+                                // Calculate start and end page numbers
+                                $start_page = max(1, $current_page - 2);
+                                $end_page = min($total_pages, $current_page + 2);
+
+                                // Show ellipsis if necessary
+                                if ($start_page > 1) {
+                                    $output .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                }
+
+                                // Show page numbers
+                                for ($i = $start_page; $i <= $end_page; $i++) {
+                                    $output .= '<li class="page-item"><a class="page-link ' . ($i == $get_reports['meta']['current_page'] ? 'active' : '') . '" href="' . esc_url(add_query_arg('p', $i)) . '">'.$i.'</a></li>';
+                                }
+
+                                // Show ellipsis if necessary
+                                if ($end_page < $total_pages) {
+                                    $output .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                }
+
+                                $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', min($get_reports['meta']['total_pages'], $get_reports['meta']['current_page'] + 1))) . '">Next &raquo;</a></li>';
+                            }
+                            $output .= '</ul>';
+                            echo $output;
+                            ?>
                         </nav>
                     </div>
                 </div>

@@ -3,13 +3,10 @@
 if (!class_exists('Safezone_Scanner')) {
     class Safezone_Scanner
     {
-
         private string $directory;
         private array $keywords;
-
         public array $results;
         public mixed $startTime;
-
 
         public function __construct($directory, $keywords)
         {

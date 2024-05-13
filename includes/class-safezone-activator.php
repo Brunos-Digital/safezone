@@ -35,6 +35,12 @@ class Safezone_Activator
     {
         add_option('sz_licence', null);
 
+        add_option('sz_firewall', "0");
+        add_option('sz_anti_spam', "0");
+
+        // last malware scan
+        add_option('sz_last_malware_scan', null);
+
         add_option('sz_disable_embeds', "0");
         add_option('sz_disable_xml', "0");
         add_option('sz_hide_wp_version', "0");
@@ -67,6 +73,8 @@ class Safezone_Activator
         global $wpdb;
         $charset_collate = $wpdb->get_charset_collate();
 
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
         $sz_whitelist = $wpdb->prefix . "sz_whitelist";
         $sql = "CREATE TABLE `" . $sz_whitelist . "` (
                       `id` mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
@@ -81,20 +89,37 @@ class Safezone_Activator
                       `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       PRIMARY KEY (`id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
 
-        $sz_malware_report = $wpdb->prefix . "sz_malware_reports";
+        $sz_malware_report = $wpdb->prefix . "sz_reports";
         $sql = "CREATE TABLE `" . $sz_malware_report . "` (
                       `id` mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
-                      `path` varchar(255) NOT NULL,
+                      `path` varchar(255) DEFAULT NULL,
+                      `step` varchar(255) DEFAULT NULL,
                       `message` varchar(255) NOT NULL,
                       `state` varchar(255) NOT NULL,
+                      `scan_type` varchar(255) NOT NULL,
+                      `ip_address` varchar(255) DEFAULT NULL,
+                      `user_agent` varchar(255) DEFAULT NULL,
+                      `country_code` varchar(255) DEFAULT NULL,
+                      `country_name` varchar(255) DEFAULT NULL,
                       `status` varchar(255) NOT NULL DEFAULT 'Pending',
                       `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       PRIMARY KEY (`id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+
+        $sz_logs = $wpdb->prefix . "sz_logs";
+        $sql = "CREATE TABLE `" . $sz_logs . "` (
+                      `id` mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
+                      `user` varchar(255) DEFAULT NULL,
+                      `setting_key` varchar(255) DEFAULT NULL,
+                      `setting_value` varchar(255) DEFAULT NULL,
+                      `setting_group` varchar(255) DEFAULT NULL,
+                      `message` varchar(255) NOT NULL,
+                      `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                      PRIMARY KEY (`id`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
         dbDelta($sql);
     }
 }

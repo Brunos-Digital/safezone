@@ -25,6 +25,9 @@ if ( ! defined( 'WPINC' ) ) {
 //print_r($a->scan());
 //echo '</pre>';
 
+
+
+echo $_SERVER['HTTP_USER_AGENT'];
 ?>
 
 <div class="app">
@@ -154,47 +157,7 @@ if ( ! defined( 'WPINC' ) ) {
                     <div class="home__chart-container"></div>
                 </div>
 
-                <div class="bottom-bar">
-                    <div class="bottom-bar__list">
-                        <div class="bottom-bar__item">
-                            <div class="bottom-bar__item-content">
-                                <span class="bottom-bar__item-text">
-                                  Cloud Protection:
-                                </span>
-                                <a href="/" class="bottom-bar__item-badge">
-                                    pro
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="bottom-bar__item">
-                            <div class="bottom-bar__item-content">
-                                <span class="bottom-bar__item-text">
-                                  Firewall:
-                                </span>
-                                <a href="/" class="bottom-bar__item-badge">
-                                    pro
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="bottom-bar__item">
-                            <div class="bottom-bar__item-content">
-                                <span class="bottom-bar__item-text">
-                                  Anti-Spam Engine:
-                                </span>
-                                <a href="/foundation-spam.html"
-                                   class="form-check form-switch form-switch-sm form-check-reverse">
-                                    <span class="form-check-label">Active</span>
-                                    <input disabled="disabled" class="form-check-input" type="checkbox"
-                                           aria-label="state" role="switch" checked="checked">
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
-                    <a href="/" class="bottom-bar__version">Free Version</a>
-                </div>
+                <?php include_once SAFEZONE_PLUGIN_PATH . '/admin/components/safezone-admin-footer.php'; ?>
 
             </div>
 

@@ -423,7 +423,7 @@ class Safezone
     {
         $check = Safezone_Firewall::get_user_info_check($this->ip_details['ip']);
         if(!$check){
-            Safezone_Report::add('User is blocked.', null, 'Blocked', 'Firewall', '', [
+            Safezone_Report::add($check[''], null, 'Blocked', 'Firewall', '', [
                 'ip' => $this->ip_details['ip'],
                 'country_code' => $this->ip_details['loc'],
                 'country_name' => null

@@ -73,6 +73,8 @@ class Safezone_Activator
         global $wpdb;
         $charset_collate = $wpdb->get_charset_collate();
 
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
         $sz_whitelist = $wpdb->prefix . "sz_whitelist";
         $sql = "CREATE TABLE `" . $sz_whitelist . "` (
                       `id` mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
@@ -87,7 +89,6 @@ class Safezone_Activator
                       `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       PRIMARY KEY (`id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
 
         $sz_malware_report = $wpdb->prefix . "sz_reports";
@@ -106,7 +107,19 @@ class Safezone_Activator
                       `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       PRIMARY KEY (`id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+
+        $sz_logs = $wpdb->prefix . "sz_logs";
+        $sql = "CREATE TABLE `" . $sz_logs . "` (
+                      `id` mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
+                      `user` varchar(255) DEFAULT NULL,
+                      `setting_key` varchar(255) DEFAULT NULL,
+                      `setting_value` varchar(255) DEFAULT NULL,
+                      `setting_group` varchar(255) DEFAULT NULL,
+                      `message` varchar(255) NOT NULL,
+                      `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                      PRIMARY KEY (`id`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
         dbDelta($sql);
     }
 }

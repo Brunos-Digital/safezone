@@ -63,6 +63,8 @@ class Safezone
 
     public array $plugin_settings;
 
+    public array $ip_details;
+
     /**
      * Define the core functionality of the plugin.
      *
@@ -77,6 +79,9 @@ class Safezone
         $this->version = SAFEZONE_VERSION;
         $this->plugin_name = SAFEZONE_PLUGIN_NAME;
         $this->plugin_slug = SAFEZONE_PLUGIN_SLUG;
+
+        $this->ip_details = $this->ip_info();
+
         $this->load_dependencies();
         $this->set_locale();
         $this->define_admin_hooks();
@@ -284,7 +289,10 @@ class Safezone
 
     public function initial(): void
     {
-        $this->loader->add_action('init', $this, 'check_user_in_door');
+        if ($this->plugin_settings['sz_anti_spam'] === '1') {
+            $this->loader->add_action('init', $this, 'check_user_in_door');
+        }
+
         $this->update_checker();
 
         if ($this->plugin_settings['sz_login_protection'] === '1') {
@@ -407,27 +415,31 @@ class Safezone
         return json_decode($json, true);
     }
 
-    private function ip_details_free() : array
+    private static function ip_info() : array
     {
         $api_url = "https://1.1.1.1/cdn-cgi/trace";
         $response = file_get_contents($api_url);
         $lines = explode("\n", $response);
-        $ip_details = array();
+        $details = [];
+        $lines = array_filter($lines, 'strlen');
         foreach ($lines as $line) {
             $parts = explode("=", $line);
             $key = trim($parts[0]);
             $value = trim($parts[1]);
-            $ip_details[$key] = $value;
+            $details[$key] = $value;
         }
-
-        return $ip_details;
+        return $details;
     }
 
     public function check_user_in_door() : void
     {
-        $check = Safezone_Firewall::get_user_info_check();
+        $check = Safezone_Firewall::get_user_info_check($this->ip_details['ip']);
         if(!$check){
-            $this->addReport('User is blocked.', 'Blocked', $_SERVER['REMOTE_ADDR'], $this->ip_details($_SERVER['REMOTE_ADDR'])['country']);
+            Safezone_Report::add('User is blocked.', null, 'Blocked', 'Firewall', '', [
+                'ip' => $this->ip_details['ip'],
+                'country_code' => $this->ip_details['loc'],
+                'country_name' => null
+            ]);
             wp_redirect('https://google.com');
             exit();
         }

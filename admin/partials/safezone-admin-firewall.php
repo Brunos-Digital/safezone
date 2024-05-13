@@ -65,7 +65,7 @@
                     <div class="sz-card sz-card-info">
                         <div class="sz-card-info__main">
                             <div class="sz-card-info__value">
-                                <span class="sz-card-info__value-text">12</span>
+                                <span class="sz-card-info__value-text"><?php echo $this->bad_bots;?></span>
                                 <span>
                       <svg class="icon">
                         <use xlink:href="images/icons.svg#admin-users"></use>
@@ -95,7 +95,7 @@
                     <div class="sz-card sz-card-info">
                         <div class="sz-card-info__main">
                             <div class="sz-card-info__value">
-                                <span class="sz-card-info__value-text">34</span>
+                                <span class="sz-card-info__value-text"><?php echo $this->login_protection;?></span>
                                 <span>
                       <svg class="icon">
                         <use xlink:href="images/icons.svg#admin-network"></use>

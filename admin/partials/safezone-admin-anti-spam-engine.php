@@ -63,7 +63,7 @@ $get_reports = $this->reports('Anti-Spam');
                     <div class="sz-card sz-card-info">
                         <div class="sz-card-info__main">
                             <div class="sz-card-info__value">
-                                <span class="sz-card-info__value-text">12</span>
+                                <span class="sz-card-info__value-text"><?php echo $this->blocked_spams;?></span>
                                 <span>
                       <svg class="icon">
                         <use xlink:href="images/icons.svg#welcome-comments"></use>
@@ -93,7 +93,7 @@ $get_reports = $this->reports('Anti-Spam');
                     <div class="sz-card sz-card-info">
                         <div class="sz-card-info__main">
                             <div class="sz-card-info__value">
-                                <span class="sz-card-info__value-text">4</span>
+                                <span class="sz-card-info__value-text"><?php echo $this->blocked_ips;?></span>
                                 <span>
                       <svg class="icon">
                         <use xlink:href="images/icons.svg#lock"></use>

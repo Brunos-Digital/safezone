@@ -88,24 +88,25 @@ Deny from all
             }
         }
 
-        public static function get_user_info_check() {
-            $user_ip = $_SERVER['REMOTE_ADDR'];
-            $user_agent = $_SERVER['HTTP_USER_AGENT'];
+        public static function get_user_info_check($user_ip)
+        {
             $response = wp_remote_post(API_URL. '/initials/check', [
                 'body' => json_encode([
                     'ip' => $user_ip,
-                    'user_agent' => $user_agent
+                    'user_agent' => $_SERVER['HTTP_USER_AGENT']
                 ]),
                 'headers' => [
+                    'Accept' => 'application/json',
                     'Content-Type' => 'application/json'
                 ]
             ]);
             $response_body = wp_remote_retrieve_body($response);
             $response_data = json_decode($response_body, true);
+
             if($response_data['success']){
-//                foreach($response_data['data'] as $data){
-//                    $this->addReport($data['message'], $data['state'], $user_ip);
-//                }
+                foreach($response_data['data'] as $data){
+                    Safezone_Report::add($data['message'], null, $data['state'], 'initial', '', $user_ip);
+                }
                 return true;
             }else{
                 return false;

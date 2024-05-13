@@ -49,6 +49,18 @@ class Safezone_Admin
      */
     public array $menu;
 
+    public int $blocked_spams;
+
+    public int $blocked_ips;
+
+    public int $blocked_activities;
+
+    public int $pending_update;
+
+    public int $bad_bots;
+
+    public int $login_protection;
+
 
     /**
      * Initialize the class and set its properties.
@@ -63,6 +75,13 @@ class Safezone_Admin
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         $this->menu = [];
+
+        $this->blocked_spams = 0;
+        $this->blocked_ips = 0;
+        $this->blocked_activities = 0;
+        $this->pending_update = 0;
+        $this->bad_bots = 0;
+        $this->login_protection = 0;
 
         $this->plugin_settings = get_options([
             'sz_licence',
@@ -286,9 +305,34 @@ class Safezone_Admin
 
     public function save_settings(): void
     {
+        global $wpdb;
         $settings = $_POST;
+        $i = 0;
         foreach ($settings['payload'] as $key => $value) {
-            update_option('sz_' . $key, $value);
+            if(get_option($key) != $value){
+
+                $group = "";
+                $message = "";
+                foreach(SAFEZONE_SETTINGS as $setting){
+                    if($setting['key'] == $key){
+                        $group = $setting['group'];
+                        $message = $setting['title'];
+                    }
+                }
+
+                $message .= " setting updated to ";
+                $message .= ($value === "1") ? "enabled" : "disabled";
+                $message .= ".";
+
+                $wpdb->insert('wp_sz_logs', [
+                    'user' => wp_get_current_user()->user_login,
+                    'message' => $message,
+                    'setting_key' => $key,
+                    'setting_value' => $value,
+                    'setting_group' => $group,
+                ]);
+            }
+            update_option($key, $value);
         }
         wp_send_json([
             'success' => true,
@@ -301,6 +345,26 @@ class Safezone_Admin
     {
         $json = file_get_contents("https://ipinfo.io/{$ip}/geo");
         return json_decode($json, true);
+    }
+
+    public function logs(): array|null|object
+    {
+        $page_number = isset($_GET['p']) ? absint($_GET['p']) : 1;
+        $items_per_page = 24;
+
+        global $wpdb;
+
+        $offset = ($page_number - 1) * $items_per_page;
+        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_logs");
+        $query = $wpdb->prepare("SELECT * FROM wp_sz_logs ORDER BY created_at DESC LIMIT %d, %d", $offset, $items_per_page);
+        return [
+            'data' => $wpdb->get_results($query, ARRAY_A),
+            'meta' => [
+                'total_count' => $total_count,
+                'total_pages' => ceil($total_count / $items_per_page),
+                'current_page' => $page_number
+            ]
+        ];
     }
 
     public function get_whitelist(): array|null|object
@@ -548,6 +612,24 @@ class Safezone_Admin
         ];
     }
 
+    public function get_logs(): array
+    {
+        global $wpdb;
+        $page_number = isset($_GET['p']) ? absint($_GET['p']) : 1;
+        $items_per_page = 24;
+        $offset = ($page_number - 1) * $items_per_page;
+        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_logs");
+        $query = $wpdb->prepare("SELECT * FROM wp_sz_logs ORDER BY created_at DESC LIMIT %d, %d", $offset, $items_per_page);
+        return [
+            'data' => $wpdb->get_results($query, ARRAY_A),
+            'meta' => [
+                'total_count' => $total_count,
+                'total_pages' => ceil($total_count / $items_per_page),
+                'current_page' => $page_number
+            ]
+        ];
+    }
+
     public function state_badge($par): array
     {
         $statuses = [
@@ -665,48 +747,63 @@ class Safezone_Admin
             }
         }
 
+        $completedSteps = 0;
+        foreach ($overview as $step) {
+            if ($step === true) {
+                $completedSteps++;
+            }
+        }
+        $maxScore = 5;
+        $percentComplete = ($completedSteps / count($overview)) * 100;
+        $score = ($percentComplete / 100) * $maxScore;
+        $roundedScore = round($score, 1);
+
         return [
-            [
-                'name' => 'Spamvertising Check',
-                'step' => '1',
-                'status' => $overview['step_1'] ? 'failed' : 'succsess',
-                'icon' => $overview['step_1'] ? 'info-outline' : 'yes'
-            ],
-            [
-                'name' => 'Blacklist Check',
-                'step' => '2',
-                'status' => $overview['step_2'] ? 'failed' : 'succsess',
-                'icon' => $overview['step_2'] ? 'info-outline' : 'yes'
-            ],
-            [
-                'name' => 'Spam Check',
-                'step' => '3',
-                'status' => $overview['step_3'] ? 'failed' : 'succsess',
-                'icon' => $overview['step_3'] ? 'info-outline' : 'yes'
-            ],
-            [
-                'name' => 'Vulnerability Scan',
-                'step' => '4',
-                'status' => $overview['step_4'] ? 'failed' : 'succsess',
-                'icon' => $overview['step_4'] ? 'info-outline' : 'yes'
-            ],
-            [
-                'name' => 'Malware Scan',
-                'step' => '5',
-                'status' => $overview['step_5'] ? 'failed' : 'succsess',
-                'icon' => $overview['step_5'] ? 'info-outline' : 'yes'
-            ],
-            [
-                'name' => 'Public Files',
-                'step' => '6',
-                'status' => $overview['step_6'] ? 'failed' : 'succsess',
-                'icon' => $overview['step_6'] ? 'info-outline' : 'yes'
-            ],
-            [
-                'name' => 'Content Safety',
-                'step' => '7',
-                'status' => $overview['step_7'] ? 'failed' : 'succsess',
-                'icon' => $overview['step_7'] ? 'info-outline' : 'yes'
+            'last_scan' => get_option('sz_last_malware_scan', 'Never'),
+            'score' => $roundedScore == 0 ? 5 : $roundedScore,
+            'steps' => [
+                [
+                    'name' => 'Spamvertising Check',
+                    'step' => '1',
+                    'status' => $overview['step_1'] ? 'failed' : 'succsess',
+                    'icon' => $overview['step_1'] ? 'info-outline' : 'yes'
+                ],
+                [
+                    'name' => 'Blacklist Check',
+                    'step' => '2',
+                    'status' => $overview['step_2'] ? 'failed' : 'succsess',
+                    'icon' => $overview['step_2'] ? 'info-outline' : 'yes'
+                ],
+                [
+                    'name' => 'Spam Check',
+                    'step' => '3',
+                    'status' => $overview['step_3'] ? 'failed' : 'succsess',
+                    'icon' => $overview['step_3'] ? 'info-outline' : 'yes'
+                ],
+                [
+                    'name' => 'Vulnerability Scan',
+                    'step' => '4',
+                    'status' => $overview['step_4'] ? 'failed' : 'succsess',
+                    'icon' => $overview['step_4'] ? 'info-outline' : 'yes'
+                ],
+                [
+                    'name' => 'Malware Scan',
+                    'step' => '5',
+                    'status' => $overview['step_5'] ? 'failed' : 'succsess',
+                    'icon' => $overview['step_5'] ? 'info-outline' : 'yes'
+                ],
+                [
+                    'name' => 'Public Files',
+                    'step' => '6',
+                    'status' => $overview['step_6'] ? 'failed' : 'succsess',
+                    'icon' => $overview['step_6'] ? 'info-outline' : 'yes'
+                ],
+                [
+                    'name' => 'Content Safety',
+                    'step' => '7',
+                    'status' => $overview['step_7'] ? 'failed' : 'succsess',
+                    'icon' => $overview['step_7'] ? 'info-outline' : 'yes'
+                ]
             ]
         ];
     }

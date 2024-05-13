@@ -11,6 +11,14 @@
  * @package    Safezone
  * @subpackage Safezone/admin/partials
  */
+
+
+if ( ! defined( 'WPINC' ) ) {
+    die;
+}
+
+$get_logs = $this->logs();
+
 ?>
 
 <div class="app">
@@ -29,34 +37,33 @@
                     <div class="tab-menu__bottom">
 
                         <div class="actions">
-                            <label class="input-group">
-                    <span class="input-group-icon">
-
-                      <svg class="icon">
-                        <use xlink:href="images/icons.svg#search"></use>
-                      </svg>
-
-                    </span>
-                                <input type="text" class="form-control" placeholder="Search for IP or hostname" aria-label="search">
-                            </label>
-                            <select class="actions-select" aria-label="actives">
-                                <option value="1" selected="selected">All activites</option>
-                                <option value="2">All activites</option>
-                            </select>
-                            <button class="btn btn-icon btn-blue-40">
-
-                                <svg class="icon">
-                                    <use xlink:href="images/icons.svg#filter"></use>
-                                </svg>
-
-                                Filters
-                            </button>
+<!--                            <label class="input-group">-->
+<!--                                <span class="input-group-icon">-->
+<!---->
+<!--                                  <svg class="icon">-->
+<!--                                    <use xlink:href="--><?php //echo SAFEZONE_PLUGIN_URL; ?><!--/admin/images/icons.svg#search"></use>-->
+<!--                                  </svg>-->
+<!---->
+<!--                                </span>-->
+<!--                                <input type="text" class="form-control" placeholder="Search for IP or hostname" aria-label="search">-->
+<!--                            </label>-->
+<!--                            <select class="actions-select" aria-label="actives">-->
+<!--                                <option value="1" selected="selected">All activites</option>-->
+<!--                                <option value="2">All activites</option>-->
+<!--                            </select>-->
+<!--                            <button class="btn btn-icon btn-blue-40">-->
+<!---->
+<!--                                <svg class="icon">-->
+<!--                                    <use xlink:href="--><?php //echo SAFEZONE_PLUGIN_URL; ?><!--/admin/images/icons.svg#filter"></use>-->
+<!--                                </svg>-->
+<!---->
+<!--                                Filters-->
+<!--                            </button>-->
                             <button class="btn btn-icon btn-blue-5 ms-sm-auto">
 
                                 <svg class="icon">
-                                    <use xlink:href="images/icons.svg#download"></use>
+                                    <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#download"></use>
                                 </svg>
-
                                 Export
                             </button>
                         </div>
@@ -71,7 +78,7 @@
                             <button class="btn btn-white btn-icon me-auto">
 
                                 <svg class="icon">
-                                    <use xlink:href="images/icons.svg#lock"></use>
+                                    <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#lock"></use>
                                 </svg>
 
                                 Manage Permissions
@@ -79,7 +86,7 @@
                             <button class="btn btn-blue-5 btn-icon">
 
                                 <svg class="icon">
-                                    <use xlink:href="images/icons.svg#download"></use>
+                                    <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#download"></use>
                                 </svg>
 
                                 Export Selected
@@ -137,417 +144,53 @@
 
                             <tbody class="table-body">
 
+                            <?php
+                                if(count($get_logs['data']) > 0){
+                                    foreach($get_logs['data'] as $key=>$value){
+                            ?>
                             <tr>
-
+                                <td><input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox></td>
                                 <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
-
+                                    <span class="table-main__type table-main__type--black">
+                                      <span class="table-main__type-icon">
+                                        <svg class="icon">
+                                          <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#admin-users"></use>
+                                        </svg>
+                                      </span>
+                                      <span class="table-main__type-text">
+                                        <?php echo $value['user'];?>
+                                      </span>
+                                    </span>
                                 </td>
 
                                 <td>
-
-                        <span class="table-main__type table-main__type--black">
-                          <span class="table-main__type-icon">
-
-                            <svg class="icon">
-                              <use xlink:href="images/icons.svg#admin-users"></use>
-                            </svg>
-
-                          </span>
-                          <span class="table-main__type-text">
-                            Admin
-                          </span>
-                        </span>
-
+                                    <span class="badge badge--error" title="IP Blocked">
+                                      <span class="badge__dot"></span>
+                                      <span class="badge__text"><?php echo $value['setting_group'];?></span>
+                                    </span>
                                 </td>
-
                                 <td>
-
-                        <span class="badge badge--error" title="IP Blocked">
-
-                          <span class="badge__dot"></span>
-
-                          <span class="badge__text">IP Blocked</span>
-                        </span>
-
+                                    <span class="text-gray-100"><?php echo date('j M Y H:i:s', strtotime($value['created_at']));?></span>
                                 </td>
-
                                 <td>
-
-                                    <span class="text-gray-100">09 March 2023, 6:34:24 PM</span>
-
+                                    <span class="text-gray-40"><?php echo $value['message'];?></span>
                                 </td>
-
                                 <td>
-
-                                    <span class="text-gray-40">IP 185.119.721.40 has been added to the whitelist.</span>
-
+<!--                                    <div class="table-dropdown dropdown">-->
+<!--                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">-->
+<!--                                            <svg class="icon">-->
+<!--                                                <use xlink:href="images/icons.svg#kebab-menu"></use>-->
+<!--                                            </svg>-->
+<!--                                        </button>-->
+<!--                                        <ul class="dropdown-menu">-->
+<!--                                            <li><button class="dropdown-item" type="button">Action</button></li>-->
+<!--                                            <li><button class="dropdown-item" type="button">Another action</button></li>-->
+<!--                                            <li><button class="dropdown-item" type="button">Something</button></li>-->
+<!--                                        </ul>-->
+<!--                                    </div>-->
                                 </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
                             </tr>
-
-                            <tr>
-
-                                <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
-
-                                </td>
-
-                                <td>
-
-                        <span class="table-main__type table-main__type--black">
-                          <span class="table-main__type-icon">
-
-                            <svg class="icon">
-                              <use xlink:href="images/icons.svg#admin-users"></use>
-                            </svg>
-
-                          </span>
-                          <span class="table-main__type-text">
-                            Admin
-                          </span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                        <span class="badge badge--error" title="IP Blocked">
-
-                          <span class="badge__dot"></span>
-
-                          <span class="badge__text">IP Blocked</span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="text-gray-100">09 March 2023, 6:34:24 PM</span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="text-gray-40">IP 185.119.721.40 has been added to the whitelist.</span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
-
-                                </td>
-
-                                <td>
-
-                        <span class="table-main__type table-main__type--black">
-                          <span class="table-main__type-icon">
-
-                            <svg class="icon">
-                              <use xlink:href="images/icons.svg#admin-users"></use>
-                            </svg>
-
-                          </span>
-                          <span class="table-main__type-text">
-                            Admin
-                          </span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                        <span class="badge badge--error" title="IP Blocked">
-
-                          <span class="badge__dot"></span>
-
-                          <span class="badge__text">IP Blocked</span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="text-gray-100">09 March 2023, 6:34:24 PM</span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="text-gray-40">IP 185.119.721.40 has been added to the whitelist.</span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
-
-                                </td>
-
-                                <td>
-
-                        <span class="table-main__type table-main__type--black">
-                          <span class="table-main__type-icon">
-
-                            <svg class="icon">
-                              <use xlink:href="images/icons.svg#admin-users"></use>
-                            </svg>
-
-                          </span>
-                          <span class="table-main__type-text">
-                            Admin
-                          </span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                        <span class="badge badge--error" title="IP Blocked">
-
-                          <span class="badge__dot"></span>
-
-                          <span class="badge__text">IP Blocked</span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="text-gray-100">09 March 2023, 6:34:24 PM</span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="text-gray-40">IP 185.119.721.40 has been added to the whitelist.</span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
-
-                                </td>
-
-                                <td>
-
-                        <span class="table-main__type table-main__type--black">
-                          <span class="table-main__type-icon">
-
-                            <svg class="icon">
-                              <use xlink:href="images/icons.svg#admin-users"></use>
-                            </svg>
-
-                          </span>
-                          <span class="table-main__type-text">
-                            Admin
-                          </span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                        <span class="badge badge--gray" title="Change Settings">
-
-                          <span class="badge__text">Change Settings</span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="text-gray-100">09 March 2023, 6:34:24 PM</span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="text-gray-40">IP 185.119.721.40 has been added to the whitelist.</span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>
-
-                                    <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
-
-                                </td>
-
-                                <td>
-
-                        <span class="table-main__type table-main__type--black">
-                          <span class="table-main__type-icon">
-
-                            <svg class="icon">
-                              <use xlink:href="images/icons.svg#admin-users"></use>
-                            </svg>
-
-                          </span>
-                          <span class="table-main__type-text">
-                            Admin
-                          </span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                        <span class="badge badge--error" title="IP Blocked">
-
-                          <span class="badge__dot"></span>
-
-                          <span class="badge__text">IP Blocked</span>
-                        </span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="text-gray-100">09 March 2023, 6:34:24 PM</span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="text-gray-40">IP 185.119.721.40 has been added to the whitelist.</span>
-
-                                </td>
-
-                                <td>
-
-                                    <div class="table-dropdown dropdown">
-                                        <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                            <svg class="icon">
-                                                <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                            </svg>
-
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><button class="dropdown-item" type="button">Action</button></li>
-                                            <li><button class="dropdown-item" type="button">Another action</button></li>
-                                            <li><button class="dropdown-item" type="button">Something</button></li>
-                                        </ul>
-                                    </div>
-
-                                </td>
-
-                            </tr>
+                            <?php } } ?>
 
                             </tbody>
 
@@ -556,15 +199,41 @@
                     </div>
                     <div class="table-pagination">
                         <nav aria-label="Table navigation">
-                            <ul class="pagination">
-                                <li class="page-item"><a class="page-link active" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item"><span class="page-link disabled">...</span></li>
-                                <li class="page-item"><a class="page-link" href="#">8</a></li>
-                                <li class="page-item"><a class="page-link" href="#">9</a></li>
-                                <li class="page-item"><a class="page-link" href="#">10</a></li>
-                            </ul>
+                            <?php
+                            $output = '<span class="page-numbers">Page ' . $get_logs['meta']['current_page'] . ' of ' . $get_logs['meta']['total_pages'] . '</span>';
+                            $output .= '<ul class="pagination">';
+                            if ($get_logs['meta']['total_pages'] > 1) {
+                                $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', max(1, $this->get_whitelist()['meta']['current_page'] - 1))) . '">&laquo; Prev</a></li>';
+
+                                // Show page numbers with ellipsis
+                                $num_pages_to_show = 5;
+                                $current_page = $get_logs['meta']['current_page'];
+                                $total_pages = $get_logs['meta']['total_pages'];
+
+                                // Calculate start and end page numbers
+                                $start_page = max(1, $current_page - 2);
+                                $end_page = min($total_pages, $current_page + 2);
+
+                                // Show ellipsis if necessary
+                                if ($start_page > 1) {
+                                    $output .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                }
+
+                                // Show page numbers
+                                for ($i = $start_page; $i <= $end_page; $i++) {
+                                    $output .= '<li class="page-item"><a class="page-link ' . ($i == $get_logs['meta']['current_page'] ? 'active' : '') . '" href="' . esc_url(add_query_arg('p', $i)) . '">'.$i.'</a></li>';
+                                }
+
+                                // Show ellipsis if necessary
+                                if ($end_page < $total_pages) {
+                                    $output .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                }
+
+                                $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', min($get_logs['meta']['total_pages'], $get_logs['meta']['current_page'] + 1))) . '">Next &raquo;</a></li>';
+                            }
+                            $output .= '</ul>';
+                            echo $output;
+                            ?>
                         </nav>
                     </div>
                 </div>

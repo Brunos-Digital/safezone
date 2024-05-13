@@ -11,6 +11,12 @@
  * @package    Safezone
  * @subpackage Safezone/admin/partials
  */
+
+
+if ( ! defined( 'WPINC' ) ) {
+    die;
+}
+
 ?>
 
 <div class="app">

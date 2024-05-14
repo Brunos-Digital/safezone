@@ -804,40 +804,11 @@ class Safezone_Admin
         ];
     }
 
-    public function check_plugin_update($slug): bool
+    public function check_all_plugins_updates(): void
     {
-        $request = wp_remote_get('https://api.wordpress.org/plugins/info/1.0/' . $slug . '.json');
-        if (!is_wp_error($request)) {
-            $body = wp_remote_retrieve_body($request);
-            $data = json_decode($body);
-
-            if ($data && isset($data->version)) {
-                $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/' . $slug . '/' . $slug . '.php');
-                if ($plugin_data) {
-                    $current_version = $plugin_data['Version'];
-                    $latest_version = $data->version;
-                    if (version_compare($latest_version, $current_version, '>')) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-    public function check_all_plugins_updates(): array
-    {
-        include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-        $plugins = get_plugins();
-        $updates_available = [];
-        foreach ($plugins as $plugin_path => $plugin_data) {
-            $plugin_name = dirname($plugin_path);
-            if ($this->check_plugin_update($plugin_name)) {
-                $updates_available[] = $plugin_data['Name'];
-            }
-        }
-        $this->pending_update = count($updates_available);
-        return $updates_available;
+        $update_plugins = get_site_transient( 'update_plugins' );
+        if ( ! empty( $update_plugins->response ) )
+            $this->pending_update = count($update_plugins->response);
     }
 
     public function blocked_activities(): void

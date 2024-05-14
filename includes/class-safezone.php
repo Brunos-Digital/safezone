@@ -293,7 +293,7 @@ class Safezone
             $this->loader->add_action('init', $this, 'check_user_in_door');
         }
 
-        $this->update_checker();
+//        $this->update_checker();
 
         if ($this->plugin_settings['sz_login_protection'] === '1') {
             new Safezone_Login_Protection();

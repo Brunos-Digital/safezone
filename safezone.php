@@ -326,4 +326,5 @@ function run_safezone() {
 	$plugin->run();
 
 }
+
 run_safezone();

@@ -88,11 +88,11 @@ Deny from all
             }
         }
 
-        public static function get_user_info_check($user_ip)
+        public static function get_user_info_check($ip)
         {
             $response = wp_remote_post(API_URL. '/initials/check', [
                 'body' => json_encode([
-                    'ip' => $user_ip,
+                    'ip' => $ip['ip'],
                     'user_agent' => $_SERVER['HTTP_USER_AGENT']
                 ]),
                 'headers' => [
@@ -105,7 +105,11 @@ Deny from all
 
             if($response_data['success']){
                 foreach($response_data['data'] as $data){
-                    Safezone_Report::add($data['message'], null, $data['state'], 'initial', '', $user_ip);
+                    Safezone_Report::add($data['message'], null, $data['state'], 'initial', '', [
+                        'ip' => $ip['ip'],
+                        'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+                        'country_code' => $ip['loc']
+                    ]);
                 }
                 return true;
             }else{

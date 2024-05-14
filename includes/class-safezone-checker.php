@@ -10,7 +10,7 @@ class Safezone_Update_Checker
     {
         $this->plugin_slug = 'safezone/safezone.php';
         $this->version = $version;
-        $this->api_url = "https://safezone.test/api/plugins/info.json";
+        $this->api_url = API_URL. "/plugins/info.json";
     }
 
     public function check_for_plugin_update($transient)

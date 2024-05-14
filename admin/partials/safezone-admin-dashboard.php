@@ -131,34 +131,21 @@ echo $_SERVER['HTTP_USER_AGENT'];
                                         <div class="sz-card-info__content-text">New update is available</div>
                                     </div>
                                 </div>
-
                                 <div class="sz-card-info__actions">
-
-                                    <a href="/">
-
+                                    <a href="<?php echo admin_url('plugins.php?plugin_status=upgrade');?>">
                                         <span class="badge badge--blue" title="Update">
-
                                           <span class="badge__text">Update</span>
                                         </span>
-
                                     </a>
-
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
-
                 <div class="home__chart">
                     <div class="home__chart-container"></div>
                 </div>
-
                 <?php include_once SAFEZONE_PLUGIN_PATH . '/admin/components/safezone-admin-footer.php'; ?>
-
             </div>
 
         </div>

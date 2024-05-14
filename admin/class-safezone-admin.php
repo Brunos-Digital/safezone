@@ -83,6 +83,8 @@ class Safezone_Admin
         $this->bad_bots = 0;
         $this->login_protection = 0;
 
+        $this->stats();
+
         $this->plugin_settings = get_options([
             'sz_licence',
             'sz_firewall',
@@ -324,13 +326,7 @@ class Safezone_Admin
                 $message .= ($value === "1") ? "enabled" : "disabled";
                 $message .= ".";
 
-                $wpdb->insert('wp_sz_logs', [
-                    'user' => wp_get_current_user()->user_login,
-                    'message' => $message,
-                    'setting_key' => $key,
-                    'setting_value' => $value,
-                    'setting_group' => $group,
-                ]);
+                Safezone_Report::add($message, null, $group, 'Settings', null, null);
             }
             update_option($key, $value);
         }
@@ -806,5 +802,69 @@ class Safezone_Admin
                 ]
             ]
         ];
+    }
+
+    public function check_plugin_update($slug): bool
+    {
+        $request = wp_remote_get('https://api.wordpress.org/plugins/info/1.0/' . $slug . '.json');
+        if (!is_wp_error($request)) {
+            $body = wp_remote_retrieve_body($request);
+            $data = json_decode($body);
+
+            if ($data && isset($data->version)) {
+                $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/' . $slug . '/' . $slug . '.php');
+                if ($plugin_data) {
+                    $current_version = $plugin_data['Version'];
+                    $latest_version = $data->version;
+                    if (version_compare($latest_version, $current_version, '>')) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+    public function check_all_plugins_updates(): array
+    {
+        include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+        $plugins = get_plugins();
+        $updates_available = [];
+        foreach ($plugins as $plugin_path => $plugin_data) {
+            $plugin_name = dirname($plugin_path);
+            if ($this->check_plugin_update($plugin_name)) {
+                $updates_available[] = $plugin_data['Name'];
+            }
+        }
+        $this->pending_update = count($updates_available);
+        return $updates_available;
+    }
+
+    public function blocked_activities(): void
+    {
+        global $wpdb;
+        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_reports WHERE status = 'Pending' AND state = 'Blocked' AND scan_type = 'Firewall'");
+        $this->blocked_activities = $total_count;
+    }
+
+    public function blocked_spams(): void
+    {
+        global $wpdb;
+        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_reports WHERE status = 'Pending' AND scan_type = 'Anti-Spam'");
+        $this->blocked_spams = $total_count;
+    }
+
+    public function bad_bots(): void
+    {
+        global $wpdb;
+        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_reports WHERE status = 'Pending' AND state = 'Blocked' AND scan_type = 'Firewall' AND category = 'Bad Bots'");
+        $this->bad_bots = $total_count;
+    }
+
+    public function stats(): void
+    {
+        $this->blocked_activities();
+        $this->blocked_spams();
+        $this->check_all_plugins_updates();
     }
 }

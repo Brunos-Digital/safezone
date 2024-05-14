@@ -421,15 +421,6 @@ class Safezone
 
     public function check_user_in_door() : void
     {
-        $check = Safezone_Firewall::get_user_info_check($this->ip_details['ip']);
-        if(!$check){
-            Safezone_Report::add($check[''], null, 'Blocked', 'Firewall', '', [
-                'ip' => $this->ip_details['ip'],
-                'country_code' => $this->ip_details['loc'],
-                'country_name' => null
-            ]);
-            wp_redirect('https://google.com');
-            exit();
-        }
+        Safezone_Firewall::get_user_info_check($this->ip_details);
     }
 }

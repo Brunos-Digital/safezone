@@ -31,7 +31,7 @@ Deny from all
             $current_content = file_get_contents($htaccess_file);
 
             // Eğer eklemek istediğiniz satırlar zaten dosyada bulunmuyorsa ekle
-            if (strpos($current_content, $htaccess_content) === false) {
+            if (!str_contains($current_content, $htaccess_content)) {
                 $file_handle = fopen($htaccess_file, 'a');
                 if ($file_handle) {
                     fwrite($file_handle, $htaccess_content);
@@ -73,7 +73,7 @@ Deny from all
             $current_content = file_get_contents($htaccess_file);
 
             // Eğer eklemek istediğiniz satırlar dosyada bulunuyorsa kaldır
-            if (strpos($current_content, $htaccess_content) !== false) {
+            if (str_contains($current_content, $htaccess_content)) {
                 $new_content = str_replace($htaccess_content, '', $current_content);
                 $file_handle = fopen($htaccess_file, 'w');
                 if ($file_handle) {
@@ -105,7 +105,7 @@ Deny from all
 
             if($response_data['success']){
                 foreach($response_data['data'] as $data){
-                    Safezone_Report::add($data['message'], null, $data['state'], 'initial', '', [
+                    Safezone_Report::add($data['message'], null, $data['state'], 'Firewall', '', [
                         'ip' => $ip['ip'],
                         'user_agent' => $_SERVER['HTTP_USER_AGENT'],
                         'country_code' => $ip['loc']

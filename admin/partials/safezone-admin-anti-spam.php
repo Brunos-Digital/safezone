@@ -65,10 +65,10 @@ $get_reports = $this->reports('Anti-Spam');
                             <div class="sz-card-info__value">
                                 <span class="sz-card-info__value-text"><?php echo $this->blocked_spams;?></span>
                                 <span>
-                      <svg class="icon">
-                        <use xlink:href="images/icons.svg#welcome-comments"></use>
-                      </svg>
-                    </span>
+                                  <svg class="icon">
+                                    <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#welcome-comments"></use>
+                                  </svg>
+                                </span>
                             </div>
                             <div class="sz-card-info__content">
                                 <div class="sz-card-info__content-title">Blocked Spams</div>
@@ -96,7 +96,7 @@ $get_reports = $this->reports('Anti-Spam');
                                 <span class="sz-card-info__value-text"><?php echo $this->blocked_ips;?></span>
                                 <span>
                       <svg class="icon">
-                        <use xlink:href="images/icons.svg#lock"></use>
+                        <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#lock"></use>
                       </svg>
                     </span>
                             </div>
@@ -126,7 +126,7 @@ $get_reports = $this->reports('Anti-Spam');
                   <span class="foundation-card__badge foundation-card__badge--warning">
 
                     <svg class="icon">
-                      <use xlink:href="images/icons.svg#info-outline"></use>
+                      <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#info-outline"></use>
                     </svg>
 
                     Update required
@@ -138,7 +138,7 @@ $get_reports = $this->reports('Anti-Spam');
                                     View All
 
                                     <svg class="icon">
-                                        <use xlink:href="images/icons.svg#arrow-right-alt2"></use>
+                                        <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#arrow-right-alt2"></use>
                                     </svg>
 
                                 </a>
@@ -149,7 +149,7 @@ $get_reports = $this->reports('Anti-Spam');
                             <div class="foundation-card__switch">
                                 <label class="form-check form-switch form-check-reverse">
                                     <span class="form-check-label">Comments</span>
-                                    <input class="form-check-input" type="checkbox" role="switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" <?php echo get_option('sz_disable_comments') === "1" ? 'checked="checked"' : '';?>>
                                 </label>
                             </div>
 <!---->
@@ -204,7 +204,7 @@ $get_reports = $this->reports('Anti-Spam');
                                 <thead class="table-head">
                                     <tr>
                                         <th class="" style="width: 64px; min-width: ; max-width:"><input type="checkbox" class="form-check-input" aria-label="select all" data-table-checkbox></th>
-                                        <th class="" style="width: auto; min-width: ; max-width:"><span>Content <span class="text-gray-30">(49 spams)</span></span></th>
+                                        <th class="" style="width: auto; min-width: ; max-width:"><span>Content <span class="text-gray-30">(<?php echo $get_reports['meta']['total_count'];?> spams)</span></span></th>
                                         <th class="" style="width: ; min-width: 156px; max-width:"><span>IP Address</span></th>
                                         <th class="" style="width: ; min-width: 156px; max-width:"><span>Type</span></th>
                                         <th class="" style="width: ; min-width: 156px; max-width:"><span>Country</span></th>

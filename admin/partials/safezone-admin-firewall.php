@@ -11,6 +11,8 @@
  * @package    Safezone
  * @subpackage Safezone/admin/partials
  */
+
+$get_reports = $this->reports('Firewall');
 ?>
 
 <div class="app">
@@ -68,7 +70,7 @@
                                 <span class="sz-card-info__value-text"><?php echo $this->bad_bots;?></span>
                                 <span>
                       <svg class="icon">
-                        <use xlink:href="images/icons.svg#admin-users"></use>
+                        <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#admin-users"></use>
                       </svg>
                     </span>
                             </div>
@@ -98,7 +100,7 @@
                                 <span class="sz-card-info__value-text"><?php echo $this->login_protection;?></span>
                                 <span>
                       <svg class="icon">
-                        <use xlink:href="images/icons.svg#admin-network"></use>
+                        <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#admin-network"></use>
                       </svg>
                     </span>
                             </div>
@@ -128,7 +130,7 @@
                   <span class="foundation-card__badge foundation-card__badge--error">
 
                     <svg class="icon">
-                      <use xlink:href="images/icons.svg#info-outline"></use>
+                      <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#info-outline"></use>
                     </svg>
 
                     Update required
@@ -216,7 +218,7 @@
 
                                     <th class="" style="width: auto; min-width: ; max-width:">
 
-                                        <span>Results <span class="text-gray-30">(4967 files scanned)</span></span>
+                                        <span>Results <span class="text-gray-30">(<?php echo $get_reports['meta']['total_count'];?> files scanned)</span></span>
 
                                     </th>
 
@@ -242,265 +244,34 @@
 
                                 <tbody class="table-body">
 
-                                <tr>
-
-                                    <td>
-
-                                        <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
-
-                                    </td>
-
-                                    <td>
-
-                                        <span>The file <b>'malware.php'</b> has been detected as malicious; immediate action is advised to remove or replace it to ensure the security of your WordPress application.</span>
-
-                                    </td>
-
-                                    <td>
-
-                          <span class="badge badge--error" title="Critical">
-
-                            <span class="badge__dot"></span>
-
-                            <span class="badge__text">Critical</span>
-                          </span>
-
-                                    </td>
-
-                                    <td>
-
-                                        <span class="text-gray-40">09 March 2023, 6:34:24 PM</span>
-
-                                    </td>
-
-                                    <td>
-
-                                        <div class="table-dropdown dropdown">
-                                            <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                                <svg class="icon">
-                                                    <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                                </svg>
-
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><button class="dropdown-item" type="button">Action</button></li>
-                                                <li><button class="dropdown-item" type="button">Another action</button></li>
-                                                <li><button class="dropdown-item" type="button">Something</button></li>
-                                            </ul>
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                                <tr>
-
-                                    <td>
-
-                                        <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
-
-                                    </td>
-
-                                    <td>
-
-                                        <span>The file <b>'malicious-code.php'</b> contains harmful content and poses a security risk to your WordPress site. It is recommended to remove or replace this file immediately.</span>
-
-                                    </td>
-
-                                    <td>
-
-                          <span class="badge badge--error" title="Critical">
-
-                            <span class="badge__dot"></span>
-
-                            <span class="badge__text">Critical</span>
-                          </span>
-
-                                    </td>
-
-                                    <td>
-
-                                        <span class="text-gray-40">09 March 2023, 6:34:24 PM</span>
-
-                                    </td>
-
-                                    <td>
-
-                                        <div class="table-dropdown dropdown">
-                                            <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                                <svg class="icon">
-                                                    <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                                </svg>
-
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><button class="dropdown-item" type="button">Action</button></li>
-                                                <li><button class="dropdown-item" type="button">Another action</button></li>
-                                                <li><button class="dropdown-item" type="button">Something</button></li>
-                                            </ul>
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                                <tr>
-
-                                    <td>
-
-                                        <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
-
-                                    </td>
-
-                                    <td>
-
-                                        <span>A phishing attempt was detected in <b>'phishing-script.js'</b> posing a risk to user security. Remove or replace the file to prevent potential data breaches.</span>
-
-                                    </td>
-
-                                    <td>
-
-                          <span class="badge badge--error" title="Update">
-
-                            <span class="badge__dot"></span>
-
-                            <span class="badge__text">Update</span>
-                          </span>
-
-                                    </td>
-
-                                    <td>
-
-                                        <span class="text-gray-40">09 March 2023, 6:34:24 PM</span>
-
-                                    </td>
-
-                                    <td>
-
-                                        <div class="table-dropdown dropdown">
-                                            <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                                <svg class="icon">
-                                                    <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                                </svg>
-
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><button class="dropdown-item" type="button">Action</button></li>
-                                                <li><button class="dropdown-item" type="button">Another action</button></li>
-                                                <li><button class="dropdown-item" type="button">Something</button></li>
-                                            </ul>
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                                <tr>
-
-                                    <td>
-
-                                        <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
-
-                                    </td>
-
-                                    <td>
-
-                                        <span>A spam bot was found in <b>'spam-bot.php'</b> posing a risk of unwanted activities. Remove or replace the file promptly to maintain the integrity of your WordPress site.</span>
-
-                                    </td>
-
-                                    <td>
-
-                          <span class="badge badge--warning" title="Warning">
-
-                            <span class="badge__dot"></span>
-
-                            <span class="badge__text">Warning</span>
-                          </span>
-
-                                    </td>
-
-                                    <td>
-
-                                        <span class="text-gray-40">09 March 2023, 6:34:24 PM</span>
-
-                                    </td>
-
-                                    <td>
-
-                                        <div class="table-dropdown dropdown">
-                                            <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                                <svg class="icon">
-                                                    <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                                </svg>
-
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><button class="dropdown-item" type="button">Action</button></li>
-                                                <li><button class="dropdown-item" type="button">Another action</button></li>
-                                                <li><button class="dropdown-item" type="button">Something</button></li>
-                                            </ul>
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                                <tr>
-
-                                    <td>
-
-                                        <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
-
-                                    </td>
-
-                                    <td>
-
-                                        <span>The plugin <b class="text-blue-50">FoxReader</b> is in need of an update.</span>
-
-                                    </td>
-
-                                    <td>
-
-                          <span class="badge badge--success" title="Fixed">
-
-                            <span class="badge__dot"></span>
-
-                            <span class="badge__text">Fixed</span>
-                          </span>
-
-                                    </td>
-
-                                    <td>
-
-                                        <span class="text-gray-40">09 March 2023, 6:34:24 PM</span>
-
-                                    </td>
-
-                                    <td>
-
-                                        <div class="table-dropdown dropdown">
-                                            <button class="table-dropdown__toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="6,14" aria-label="open table menu">
-
-                                                <svg class="icon">
-                                                    <use xlink:href="images/icons.svg#kebab-menu"></use>
-                                                </svg>
-
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><button class="dropdown-item" type="button">Action</button></li>
-                                                <li><button class="dropdown-item" type="button">Another action</button></li>
-                                                <li><button class="dropdown-item" type="button">Something</button></li>
-                                            </ul>
-                                        </div>
-
-                                    </td>
-
-                                </tr>
+                                <?php
+                                if(count($get_reports) > 0){
+                                    foreach($get_reports['data'] as $key=>$value){
+                                        ?>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox>
+                                            </td>
+                                            <td>
+                                                <span><?php echo $value['message'];?></span><br /><small><?php echo $value['path'];?></small>
+                                            </td>
+                                            <td>
+                                              <span class="badge badge--<?php echo $this->state_badge($value['state'])[0];?>" title="Critical">
+                                                <span class="badge__dot"></span>
+                                                <span class="badge__text"><?php echo $this->state_badge($value['state'])[1];?></span>
+                                              </span>
+                                            </td>
+                                            <td>
+                                                <span class="text-gray-40"><?php echo date('j M Y H:i:s', strtotime($value['created_at']));?></span>
+                                            </td>
+                                            <td>
+                                                <div class="foundation-table__actions">
+                                                    <a href="javascript:void(0);" class="text-gray-10 malware_report_ignore" data-id="<?php echo $value['id'];?>">Ignore</a>
+                                                    <!--                                        <a href="#" class="text-blue-50">Details</a>-->
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php } } ?>
 
                                 </tbody>
 
@@ -509,15 +280,41 @@
                         </div>
                         <div class="table-pagination">
                             <nav aria-label="Table navigation">
-                                <ul class="pagination">
-                                    <li class="page-item"><a class="page-link active" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><span class="page-link disabled">...</span></li>
-                                    <li class="page-item"><a class="page-link" href="#">8</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">9</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">10</a></li>
-                                </ul>
+                                <?php
+                                $output = '<span class="page-numbers">Page ' . $get_reports['meta']['current_page'] . ' of ' . $get_reports['meta']['total_pages'] . '</span>';
+                                $output .= '<ul class="pagination">';
+                                if ($get_reports['meta']['total_pages'] > 1) {
+                                    $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', max(1, $this->get_whitelist()['meta']['current_page'] - 1))) . '">&laquo; Prev</a></li>';
+
+                                    // Show page numbers with ellipsis
+                                    $num_pages_to_show = 5;
+                                    $current_page = $get_reports['meta']['current_page'];
+                                    $total_pages = $get_reports['meta']['total_pages'];
+
+                                    // Calculate start and end page numbers
+                                    $start_page = max(1, $current_page - 2);
+                                    $end_page = min($total_pages, $current_page + 2);
+
+                                    // Show ellipsis if necessary
+                                    if ($start_page > 1) {
+                                        $output .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                    }
+
+                                    // Show page numbers
+                                    for ($i = $start_page; $i <= $end_page; $i++) {
+                                        $output .= '<li class="page-item"><a class="page-link ' . ($i == $get_reports['meta']['current_page'] ? 'active' : '') . '" href="' . esc_url(add_query_arg('p', $i)) . '">'.$i.'</a></li>';
+                                    }
+
+                                    // Show ellipsis if necessary
+                                    if ($end_page < $total_pages) {
+                                        $output .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                    }
+
+                                    $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', min($get_reports['meta']['total_pages'], $get_reports['meta']['current_page'] + 1))) . '">Next &raquo;</a></li>';
+                                }
+                                $output .= '</ul>';
+                                echo $output;
+                                ?>
                             </nav>
                         </div>
                     </div>

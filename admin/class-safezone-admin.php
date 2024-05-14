@@ -165,7 +165,7 @@ class Safezone_Admin
             add_submenu_page('safezone-dashboard', 'Firewall (Free)', 'Firewall (Free)', 'manage_options', 'safezone-firewall-free', [$this, 'safezone_router']);
         }
 
-        add_submenu_page('safezone-dashboard', 'Anti-Spam Engine', 'Anti-Spam Engine', 'manage_options', 'safezone-anti-spam-engine', [$this, 'safezone_router']);
+        add_submenu_page('safezone-dashboard', 'Anti-Spam', 'Anti-Spam', 'manage_options', 'safezone-anti-spam', [$this, 'safezone_router']);
         add_submenu_page('safezone-dashboard', 'Malware Scanner', 'Malware Scanner', 'manage_options', 'safezone-malware-scanner', [$this, 'safezone_router']);
 
 
@@ -180,7 +180,7 @@ class Safezone_Admin
     public function safezone_router(): void
     {
         ob_start();
-        $validPages = ['safezone-firewall', 'safezone-firewall-free', 'safezone-malware-scanner', 'safezone-anti-spam-engine', 'safezone-events', 'safezone-lockouts', 'safezone-whitelist', 'safezone-logs', 'safezone-settings'];
+        $validPages = ['safezone-firewall', 'safezone-firewall-free', 'safezone-malware-scanner', 'safezone-anti-spam', 'safezone-events', 'safezone-lockouts', 'safezone-whitelist', 'safezone-logs', 'safezone-settings'];
         $page = 'dashboard';
         if (isset($_GET["page"]) && in_array($_GET["page"], $validPages)) {
             $page = str_replace('safezone-', '', $_GET["page"]);
@@ -828,7 +828,7 @@ class Safezone_Admin
     public function bad_bots(): void
     {
         global $wpdb;
-        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_reports WHERE status = 'Pending' AND state = 'Blocked' AND scan_type = 'Firewall' AND category = 'Bad Bots'");
+        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_reports WHERE status = 'Pending' AND state = 'Bad Bots' AND scan_type = 'Firewall'");
         $this->bad_bots = $total_count;
     }
 
@@ -836,6 +836,7 @@ class Safezone_Admin
     {
         $this->blocked_activities();
         $this->blocked_spams();
+        $this->bad_bots();
         $this->check_all_plugins_updates();
     }
 }

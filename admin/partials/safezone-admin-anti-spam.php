@@ -134,7 +134,7 @@ $get_reports = $this->reports('Anti-Spam');
 
                             <div class="foundation-card__content">
                                 <div class="foundation-card__content-title">Specific Settings</div>
-                                <a href="/" class="foundation-card__content-link shadow-none">
+                                <a href="<>" class="foundation-card__content-link shadow-none">
                                     View All
 
                                     <svg class="icon">
@@ -152,20 +152,20 @@ $get_reports = $this->reports('Anti-Spam');
                                     <input class="form-check-input" type="checkbox" role="switch">
                                 </label>
                             </div>
-
-                            <div class="foundation-card__switch">
-                                <label class="form-check form-switch form-check-reverse">
-                                    <span class="form-check-label">Payments</span>
-                                    <input class="form-check-input" type="checkbox" role="switch" checked="checked">
-                                </label>
-                            </div>
-
-                            <div class="foundation-card__switch">
-                                <label class="form-check form-switch form-check-reverse">
-                                    <span class="form-check-label">Contact Form</span>
-                                    <input class="form-check-input" type="checkbox" role="switch" checked="checked">
-                                </label>
-                            </div>
+<!---->
+<!--                            <div class="foundation-card__switch">-->
+<!--                                <label class="form-check form-switch form-check-reverse">-->
+<!--                                    <span class="form-check-label">Payments</span>-->
+<!--                                    <input class="form-check-input" type="checkbox" role="switch" checked="checked">-->
+<!--                                </label>-->
+<!--                            </div>-->
+<!---->
+<!--                            <div class="foundation-card__switch">-->
+<!--                                <label class="form-check form-switch form-check-reverse">-->
+<!--                                    <span class="form-check-label">Contact Form</span>-->
+<!--                                    <input class="form-check-input" type="checkbox" role="switch" checked="checked">-->
+<!--                                </label>-->
+<!--                            </div>-->
 
                         </div>
                     </div>

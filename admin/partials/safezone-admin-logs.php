@@ -17,7 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
-$get_logs = $this->logs();
+$get_reports = $this->reports('Settings');
 
 ?>
 
@@ -110,27 +110,21 @@ $get_logs = $this->logs();
 
                                 </th>
 
-                                <th class="" style="width: 112px; min-width: ; max-width:">
-
-                                    <span>User</span>
-
-                                </th>
-
                                 <th class="" style="width: ; min-width: 175px; max-width:">
 
                                     <span>Category</span>
 
                                 </th>
 
-                                <th class="" style="width: ; min-width: 145px; max-width:">
-
-                                    <span>Date</span>
-
-                                </th>
-
                                 <th class="" style="width: auto; min-width: ; max-width:">
 
                                     <span>Activity</span>
+
+                                </th>
+
+                                <th class="" style="width: ; min-width: 145px; max-width:">
+
+                                    <span>Date</span>
 
                                 </th>
 
@@ -145,35 +139,23 @@ $get_logs = $this->logs();
                             <tbody class="table-body">
 
                             <?php
-                                if(count($get_logs['data']) > 0){
-                                    foreach($get_logs['data'] as $key=>$value){
+                                if(count($get_reports['data']) > 0){
+                                    foreach($get_reports['data'] as $key=>$value){
                             ?>
                             <tr>
                                 <td><input type="checkbox" class="form-check-input" aria-label="select item" data-table-checkbox></td>
                                 <td>
-                                    <span class="table-main__type table-main__type--black">
-                                      <span class="table-main__type-icon">
-                                        <svg class="icon">
-                                          <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#admin-users"></use>
-                                        </svg>
-                                      </span>
-                                      <span class="table-main__type-text">
-                                        <?php echo $value['user'];?>
-                                      </span>
+                                    <span class="badge badge--error" title="IP Blocked">
+                                      <span class="badge__dot"></span>
+                                      <span class="badge__text"><?php echo $value['state'];?></span>
                                     </span>
                                 </td>
 
                                 <td>
-                                    <span class="badge badge--error" title="IP Blocked">
-                                      <span class="badge__dot"></span>
-                                      <span class="badge__text"><?php echo $value['setting_group'];?></span>
-                                    </span>
+                                    <span class="text-gray-40"><?php echo $value['message'];?></span>
                                 </td>
                                 <td>
                                     <span class="text-gray-100"><?php echo date('j M Y H:i:s', strtotime($value['created_at']));?></span>
-                                </td>
-                                <td>
-                                    <span class="text-gray-40"><?php echo $value['message'];?></span>
                                 </td>
                                 <td>
 <!--                                    <div class="table-dropdown dropdown">-->
@@ -200,15 +182,15 @@ $get_logs = $this->logs();
                     <div class="table-pagination">
                         <nav aria-label="Table navigation">
                             <?php
-                            $output = '<span class="page-numbers">Page ' . $get_logs['meta']['current_page'] . ' of ' . $get_logs['meta']['total_pages'] . '</span>';
+                            $output = '<span class="page-numbers">Page ' . $get_reports['meta']['current_page'] . ' of ' . $get_reports['meta']['total_pages'] . '</span>';
                             $output .= '<ul class="pagination">';
-                            if ($get_logs['meta']['total_pages'] > 1) {
+                            if ($get_reports['meta']['total_pages'] > 1) {
                                 $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', max(1, $this->get_whitelist()['meta']['current_page'] - 1))) . '">&laquo; Prev</a></li>';
 
                                 // Show page numbers with ellipsis
                                 $num_pages_to_show = 5;
-                                $current_page = $get_logs['meta']['current_page'];
-                                $total_pages = $get_logs['meta']['total_pages'];
+                                $current_page = $get_reports['meta']['current_page'];
+                                $total_pages = $get_reports['meta']['total_pages'];
 
                                 // Calculate start and end page numbers
                                 $start_page = max(1, $current_page - 2);
@@ -221,7 +203,7 @@ $get_logs = $this->logs();
 
                                 // Show page numbers
                                 for ($i = $start_page; $i <= $end_page; $i++) {
-                                    $output .= '<li class="page-item"><a class="page-link ' . ($i == $get_logs['meta']['current_page'] ? 'active' : '') . '" href="' . esc_url(add_query_arg('p', $i)) . '">'.$i.'</a></li>';
+                                    $output .= '<li class="page-item"><a class="page-link ' . ($i == $get_reports['meta']['current_page'] ? 'active' : '') . '" href="' . esc_url(add_query_arg('p', $i)) . '">'.$i.'</a></li>';
                                 }
 
                                 // Show ellipsis if necessary
@@ -229,7 +211,7 @@ $get_logs = $this->logs();
                                     $output .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
                                 }
 
-                                $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', min($get_logs['meta']['total_pages'], $get_logs['meta']['current_page'] + 1))) . '">Next &raquo;</a></li>';
+                                $output .= '<li class="page-item"><a class="page-link" href="' . esc_url(add_query_arg('p', min($get_reports['meta']['total_pages'], $get_reports['meta']['current_page'] + 1))) . '">Next &raquo;</a></li>';
                             }
                             $output .= '</ul>';
                             echo $output;

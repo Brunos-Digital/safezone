@@ -33,7 +33,7 @@ if ( ! defined( 'WPINC' ) ) {
 const SAFEZONE_VERSION = "1.0";
 const SAFEZONE_PLUGIN_NAME = 'WP Safe Zone';
 const SAFEZONE_PLUGIN_SLUG = 'safezone';
-const API_URL = 'https://api.safezone.test/api';
+const API_URL = 'http://api.wpsafezone.com/api';
 const CLIENT_URL = 'https://wpsafezone.com';
 
 define("SAFEZONE_PLUGIN_URL", plugin_dir_url(__FILE__));
@@ -41,17 +41,6 @@ define("SAFEZONE_PLUGIN_PATH", plugin_dir_path(__FILE__));
 const SAFEZONE_PLUGIN_PRO_PATH = SAFEZONE_PLUGIN_PATH . 'includes/class-safezone-pro.php';
 
 
-//'sz_aggressive_search',
-//'sz_enable_autoscanning',
-//'sz_schedule_autoscanning',
-//'sz_importing_file_monitoring',
-//'sz_scan_html_code',
-//'sz_heuristic_analysis',
-//'sz_set_custom_scan_path',
-//'sz_check_plugin',
-//'sz_check_theme',
-//'sz_check_exploits',
-//'sz_login_protection',
 const SAFEZONE_SETTINGS = [
     [
         'key' => 'sz_disable_embeds',

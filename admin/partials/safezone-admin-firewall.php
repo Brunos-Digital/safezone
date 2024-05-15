@@ -80,17 +80,17 @@ $get_reports = $this->reports('Firewall');
                             </div>
                         </div>
 
-                        <div class="sz-card-info__actions">
-
-                            <select class="form-select form-select-sm" aria-label="info select">
-
-                                <option value="1" selected="selected">Today</option>
-
-                                <option value="2">Today</option>
-
-                            </select>
-
-                        </div>
+<!--                        <div class="sz-card-info__actions">-->
+<!---->
+<!--                            <select class="form-select form-select-sm" aria-label="info select">-->
+<!---->
+<!--                                <option value="1" selected="selected">Today</option>-->
+<!---->
+<!--                                <option value="2">Today</option>-->
+<!---->
+<!--                            </select>-->
+<!---->
+<!--                        </div>-->
 
                     </div>
 
@@ -99,10 +99,10 @@ $get_reports = $this->reports('Firewall');
                             <div class="sz-card-info__value">
                                 <span class="sz-card-info__value-text"><?php echo $this->login_protection;?></span>
                                 <span>
-                      <svg class="icon">
-                        <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#admin-network"></use>
-                      </svg>
-                    </span>
+                                  <svg class="icon">
+                                    <use xlink:href="<?php echo SAFEZONE_PLUGIN_URL; ?>/admin/images/icons.svg#admin-network"></use>
+                                  </svg>
+                                </span>
                             </div>
                             <div class="sz-card-info__content">
                                 <div class="sz-card-info__content-title">Login Protection</div>
@@ -110,17 +110,12 @@ $get_reports = $this->reports('Firewall');
                             </div>
                         </div>
 
-                        <div class="sz-card-info__actions">
-
-                            <select class="form-select form-select-sm" aria-label="info select">
-
-                                <option value="1" selected="selected">Today</option>
-
-                                <option value="2">Today</option>
-
-                            </select>
-
-                        </div>
+<!--                        <div class="sz-card-info__actions">-->
+<!--                            <select class="form-select form-select-sm" aria-label="info select">-->
+<!--                                <option value="1" selected="selected">Today</option>-->
+<!--                                <option value="2">Today</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
 
                     </div>
 
@@ -153,21 +148,21 @@ $get_reports = $this->reports('Firewall');
                             <div class="foundation-card__switch">
                                 <label class="form-check form-switch form-check-reverse">
                                     <span class="form-check-label">XML-RPC</span>
-                                    <input class="form-check-input" type="checkbox" role="switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" <?php echo get_option('sz_disable_xml') === "1" ? 'checked="checked"' : '';?>>
                                 </label>
                             </div>
 
                             <div class="foundation-card__switch">
                                 <label class="form-check form-switch form-check-reverse">
                                     <span class="form-check-label">Rest API</span>
-                                    <input class="form-check-input" type="checkbox" role="switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" <?php echo get_option('sz_disable_rest_api') === "1" ? 'checked="checked"' : '';?>>
                                 </label>
                             </div>
 
                             <div class="foundation-card__switch">
                                 <label class="form-check form-switch form-check-reverse">
                                     <span class="form-check-label">Disable RSS</span>
-                                    <input class="form-check-input" type="checkbox" role="switch" checked="checked">
+                                    <input class="form-check-input" type="checkbox" role="switch" <?php echo get_option('sz_disable_rss_feeds') === "1" ? 'checked="checked"' : '';?>>
                                 </label>
                             </div>
 

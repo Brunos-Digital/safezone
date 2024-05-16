@@ -397,13 +397,13 @@ class Safezone
         echo '<!-- Professional Security & Firewall by Wp Safe Zone - https://wpsafezone.com/ -->';
     }
 
-    private function ip_details($ip) : array
+    public function ip_details($ip) : array
     {
         $json = file_get_contents("https://ipinfo.io/{$ip}/geo");
         return json_decode($json, true);
     }
 
-    private static function ip_info() : array
+    public static function ip_info() : array
     {
         $api_url = "https://1.1.1.1/cdn-cgi/trace";
         $response = file_get_contents($api_url);

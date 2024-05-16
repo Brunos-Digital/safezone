@@ -91,8 +91,8 @@ class Safezone_Activator
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
         dbDelta($sql);
 
-        $sz_malware_report = $wpdb->prefix . "sz_reports";
-        $sql = "CREATE TABLE `" . $sz_malware_report . "` (
+        $sz_report = $wpdb->prefix . "sz_reports";
+        $sql = "CREATE TABLE `" . $sz_report . "` (
                       `id` mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
                       `path` varchar(255) DEFAULT NULL,
                       `step` varchar(255) DEFAULT NULL,
@@ -104,19 +104,6 @@ class Safezone_Activator
                       `country_code` varchar(255) DEFAULT NULL,
                       `country_name` varchar(255) DEFAULT NULL,
                       `status` varchar(255) NOT NULL DEFAULT 'Pending',
-                      `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                      PRIMARY KEY (`id`)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-        dbDelta($sql);
-
-        $sz_logs = $wpdb->prefix . "sz_logs";
-        $sql = "CREATE TABLE `" . $sz_logs . "` (
-                      `id` mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
-                      `user` varchar(255) DEFAULT NULL,
-                      `setting_key` varchar(255) DEFAULT NULL,
-                      `setting_value` varchar(255) DEFAULT NULL,
-                      `setting_group` varchar(255) DEFAULT NULL,
-                      `message` varchar(255) NOT NULL,
                       `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       PRIMARY KEY (`id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";

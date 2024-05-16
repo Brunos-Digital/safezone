@@ -3,11 +3,6 @@
 /**
  * The plugin bootstrap file
  *
- * This file is read by WordPress to generate the plugin information in the plugin
- * admin area. This file also includes all of the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.
- *
  * @link              https://brunos.digital
  * @since             1.0.0
  * @package           Safezone
@@ -27,19 +22,18 @@
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
-	die;
+    die;
 }
 
 const SAFEZONE_VERSION = "1.0";
 const SAFEZONE_PLUGIN_NAME = 'WP Safe Zone';
 const SAFEZONE_PLUGIN_SLUG = 'safezone';
-const API_URL = 'http://api.wpsafezone.com/api';
+const API_URL = 'https://api.wpsafezone.com/api';
 const CLIENT_URL = 'https://wpsafezone.com';
 
 define("SAFEZONE_PLUGIN_URL", plugin_dir_url(__FILE__));
 define("SAFEZONE_PLUGIN_PATH", plugin_dir_path(__FILE__));
 const SAFEZONE_PLUGIN_PRO_PATH = SAFEZONE_PLUGIN_PATH . 'includes/class-safezone-pro.php';
-
 
 const SAFEZONE_SETTINGS = [
     [
@@ -141,7 +135,7 @@ const SAFEZONE_SETTINGS = [
         'group' => 'anti-spam',
         'package' => 'free'
     ],
-[
+    [
         'key' => 'sz_protect_woocommerce_payment_forms',
         'title' => 'Protect WooCommerce Payment Forms',
         'description' => 'Prevents spam and attacks on WooCommerce\'s payment, registration and login areas.',
@@ -275,9 +269,9 @@ const SAFEZONE_SETTINGS = [
  */
 function activate_safezone(): void
 {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-safezone-activator.php';
+    require_once plugin_dir_path( __FILE__ ) . 'includes/class-safezone-activator.php';
     $activator = new Safezone_Activator();
-	$activator->activate();
+    $activator->activate();
 }
 
 /**
@@ -286,9 +280,9 @@ function activate_safezone(): void
  */
 function deactivate_safezone(): void
 {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-safezone-deactivator.php';
+    require_once plugin_dir_path( __FILE__ ) . 'includes/class-safezone-deactivator.php';
     $deactivator = new Safezone_Deactivator();
-	$deactivator->deactivate();
+    $deactivator->deactivate();
 }
 
 register_activation_hook( __FILE__, 'activate_safezone' );
@@ -310,10 +304,8 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-safezone.php';
  * @since    1.0.0
  */
 function run_safezone() {
-
-	$plugin = new Safezone();
-	$plugin->run();
-
+    $plugin = new Safezone();
+    $plugin->run();
 }
 
 run_safezone();

@@ -83,7 +83,11 @@ class Safezone_Admin
         $this->bad_bots = 0;
         $this->login_protection = 0;
 
-        $this->stats();
+//        $this->stats();
+//        $this->blocked_activities();
+//        $this->blocked_spams();
+//        $this->bad_bots();
+//        $this->check_all_plugins_updates();
 
         $this->plugin_settings = get_options([
             'sz_licence',
@@ -307,7 +311,6 @@ class Safezone_Admin
 
     public function save_settings(): void
     {
-        global $wpdb;
         $settings = $_POST;
         $i = 0;
         foreach ($settings['payload'] as $key => $value) {
@@ -343,25 +346,6 @@ class Safezone_Admin
         return json_decode($json, true);
     }
 
-    public function logs(): array|null|object
-    {
-        $page_number = isset($_GET['p']) ? absint($_GET['p']) : 1;
-        $items_per_page = 24;
-
-        global $wpdb;
-
-        $offset = ($page_number - 1) * $items_per_page;
-        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_logs");
-        $query = $wpdb->prepare("SELECT * FROM wp_sz_logs ORDER BY created_at DESC LIMIT %d, %d", $offset, $items_per_page);
-        return [
-            'data' => $wpdb->get_results($query, ARRAY_A),
-            'meta' => [
-                'total_count' => $total_count,
-                'total_pages' => ceil($total_count / $items_per_page),
-                'current_page' => $page_number
-            ]
-        ];
-    }
 
     public function get_whitelist(): array|null|object
     {
@@ -608,24 +592,6 @@ class Safezone_Admin
         ];
     }
 
-    public function get_logs(): array
-    {
-        global $wpdb;
-        $page_number = isset($_GET['p']) ? absint($_GET['p']) : 1;
-        $items_per_page = 24;
-        $offset = ($page_number - 1) * $items_per_page;
-        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_logs");
-        $query = $wpdb->prepare("SELECT * FROM wp_sz_logs ORDER BY created_at DESC LIMIT %d, %d", $offset, $items_per_page);
-        return [
-            'data' => $wpdb->get_results($query, ARRAY_A),
-            'meta' => [
-                'total_count' => $total_count,
-                'total_pages' => ceil($total_count / $items_per_page),
-                'current_page' => $page_number
-            ]
-        ];
-    }
-
     public function state_badge($par): array
     {
         $statuses = [
@@ -807,36 +773,32 @@ class Safezone_Admin
     public function check_all_plugins_updates(): void
     {
         $update_plugins = get_site_transient( 'update_plugins' );
-        if ( ! empty( $update_plugins->response ) )
+        if ( ! empty( $update_plugins->response ) ){
             $this->pending_update = count($update_plugins->response);
+        }
     }
 
     public function blocked_activities(): void
     {
         global $wpdb;
-        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_reports WHERE status = 'Pending' AND state = 'Blocked' AND scan_type = 'Firewall'");
+        $table_name = $wpdb->prefix . 'sz_reports';
+        $total_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE status = %s AND state = %s AND scan_type = %s", 'Pending', 'Blocked', 'Firewall'));
         $this->blocked_activities = $total_count;
     }
 
     public function blocked_spams(): void
     {
         global $wpdb;
-        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_reports WHERE status = 'Pending' AND scan_type = 'Anti-Spam'");
+        $table_name = $wpdb->prefix . 'sz_reports';
+        $total_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE status = %s AND scan_type = %s", 'Pending', 'Anti-Spam'));
         $this->blocked_spams = $total_count;
     }
 
     public function bad_bots(): void
     {
         global $wpdb;
-        $total_count = $wpdb->get_var("SELECT COUNT(*) FROM wp_sz_reports WHERE status = 'Pending' AND state = 'Bad Bots' AND scan_type = 'Firewall'");
+        $table_name = $wpdb->prefix . 'sz_reports';
+        $total_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE status = %s AND state = %s AND scan_type = %s", 'Pending', 'Bad Bots', 'Firewall'));
         $this->bad_bots = $total_count;
-    }
-
-    public function stats(): void
-    {
-        $this->blocked_activities();
-        $this->blocked_spams();
-        $this->bad_bots();
-        $this->check_all_plugins_updates();
     }
 }

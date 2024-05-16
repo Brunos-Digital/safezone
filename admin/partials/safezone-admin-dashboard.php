@@ -26,8 +26,6 @@ if ( ! defined( 'WPINC' ) ) {
 //echo '</pre>';
 
 
-
-echo $_SERVER['HTTP_USER_AGENT'];
 ?>
 
 <div class="app">
